@@ -1,0 +1,89 @@
+@font-face {
+    font-family: Linik-Black;
+    src: url('../../fonts/LinikSans-Black.ttf');
+}
+
+@font-face {
+    font-family: Linik-Bold;
+    src: url('../../fonts/LinikSans-Bold.ttf');
+}
+
+@font-face {
+    font-family: Linik-Medium;
+    src: url('../../fonts/LinikSans-Medium.ttf');
+}
+
+@font-face {
+    font-family: Linik-Regular;
+    src: url('../../fonts/LinikSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: Linik-Light;
+    src: url('../../fonts/LinikSans-Light.ttf');
+}
+
+@font-face {
+    font-family: Linik-Thin;
+    src: url('../../fonts/LinikSans-Thin.ttf');
+}
+
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    transition: ease-in-out .2s;
+    transition: background-color none;
+}
+
+body {
+    display: block;
+    font-family: Linik-Regular;
+    font-size: 16px;
+    background-color: #1B1B1D;
+    color: #ffffff;
+    padding: 0px 70px;
+}
+
+
+/* Buttons start */
+button {
+    font-family: Linik-Medium;
+    font-size: 24px;
+    background-color: #E38F25;
+    color: #1B1B1D;
+    padding: 10px 50px;
+    border: none;
+    border-radius: 50px;
+}
+
+
+/* Heading */
+h1, h2, h3, h4, h5, h6 {
+    font-family: Linik-Bold;
+}
+
+
+/* Container start */
+.container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    width: 100%;
+}
+/* Container end */
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+}
+
+/* Pending Orders start */
+.card {
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #252527;
+}
+/* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */

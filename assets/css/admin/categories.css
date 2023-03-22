@@ -1,0 +1,102 @@
+@font-face {
+    font-family: Linik-Black;
+    src: url('../../fonts/LinikSans-Black.ttf');
+}
+
+@font-face {
+    font-family: Linik-Bold;
+    src: url('../../fonts/LinikSans-Bold.ttf');
+}
+
+@font-face {
+    font-family: Linik-Medium;
+    src: url('../../fonts/LinikSans-Medium.ttf');
+}
+
+@font-face {
+    font-family: Linik-Regular;
+    src: url('../../fonts/LinikSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: Linik-Light;
+    src: url('../../fonts/LinikSans-Light.ttf');
+}
+
+@font-face {
+    font-family: Linik-Thin;
+    src: url('../../fonts/LinikSans-Thin.ttf');
+}
+
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    transition: ease-in-out .2s;
+    transition: background-color none;
+}
+
+body {
+    display: block;
+    font-family: Linik-Regular;
+    font-size: 16px;
+    background-color: #1B1B1D;
+    color: #ffffff;
+    padding: 0px 70px;
+}
+
+
+/* Heading */
+h1, h2, h3, h4, h5, h6 {
+    font-family: Linik-Bold;
+}
+
+
+/* Container start */
+.container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin-bottom: 60px;
+}
+/* Container end */
+
+
+/* Categories start */
+.categories-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top h1 {
+    font-family: Linik-Medium;
+}
+
+.categories-wrapper .categories {
+    padding: 0 20px 0px 20px;
+    border-radius: 20px;
+    background-color: #252527;
+}
+
+.categories-wrapper .categories table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 20px;
+    text-align: left;
+}
+
+.categories-wrapper .categories table th {
+    font-weight: 400;
+    padding: 0 0 20px 0;
+    color: #B3B3B3;
+    border-bottom: 2px solid #202022;
+}
+/* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */

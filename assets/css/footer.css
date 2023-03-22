@@ -1,0 +1,115 @@
+@font-face {
+    font-family: Linik-Black;
+    src: url('../fonts/LinikSans-Black.ttf');
+}
+
+@font-face {
+    font-family: Linik-Bold;
+    src: url('../fonts/LinikSans-Bold.ttf');
+}
+
+@font-face {
+    font-family: Linik-Medium;
+    src: url('../fonts/LinikSans-Medium.ttf');
+}
+
+@font-face {
+    font-family: Linik-Regular;
+    src: url('../fonts/LinikSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: Linik-Light;
+    src: url('../fonts/LinikSans-Light.ttf');
+}
+
+@font-face {
+    font-family: Linik-Thin;
+    src: url('../fonts/LinikSans-Thin.ttf');
+}
+
+
+/* Footer start */  
+footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 160px;
+    margin: 120px 0 0 0;
+}
+
+footer .footer-top {
+    display: flex;
+    flex-direction: row;
+}
+
+footer .footer-top .footer-left {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+}
+
+footer .footer-top .footer-left h2 {
+    font-family: Linik-Bold;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+footer .footer-top .footer-right {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex: 3;
+}
+
+footer .footer-top .footer-right .footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+footer .footer-top .footer-right .footer-column h3 {
+    font-family: Linik-Regular;
+    font-size: 24px;
+    color: #B3B3B3;
+}
+
+footer .footer-top .footer-right .footer-column ul {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+}
+
+footer .footer-top .footer-right .footer-column a {
+    font-family: Linik-Medium;
+    font-size: 24px;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+footer .footer-top .footer-right .footer-column a:hover {
+    color: #E38F25;
+}
+
+footer .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+}
+
+footer .footer-bottom .footer-socials {
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+
+footer .footer-bottom .footer-socials a {
+    font-size: 24px;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+footer .footer-bottom .footer-socials a:hover {
+    color: #E38F25;
+}
+/* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */

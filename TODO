@@ -1,0 +1,12 @@
+* Clean up data.inc.php with:
+    - Make consistant functions for every table in the database. Only return resultsets (if arrays) or strings (if single value is required)
+    - Try reusing functions
+
+* Add platforms page for administrators to add/edit/remove platforms
+
+-- MAYBE
+* Registration process:
+    - email and password
+
+    * on first login with new account:
+        - ask for payment details (inc. address)

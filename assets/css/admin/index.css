@@ -1,0 +1,246 @@
+@font-face {
+    font-family: Linik-Black;
+    src: url('../../fonts/LinikSans-Black.ttf');
+}
+
+@font-face {
+    font-family: Linik-Bold;
+    src: url('../../fonts/LinikSans-Bold.ttf');
+}
+
+@font-face {
+    font-family: Linik-Medium;
+    src: url('../../fonts/LinikSans-Medium.ttf');
+}
+
+@font-face {
+    font-family: Linik-Regular;
+    src: url('../../fonts/LinikSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: Linik-Light;
+    src: url('../../fonts/LinikSans-Light.ttf');
+}
+
+@font-face {
+    font-family: Linik-Thin;
+    src: url('../../fonts/LinikSans-Thin.ttf');
+}
+
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    transition: ease-in-out .2s;
+    transition: background-color none;
+}
+
+body {
+    display: block;
+    font-family: Linik-Regular;
+    font-size: 16px;
+    background-color: #1B1B1D;
+    color: #ffffff;
+    padding: 0px 70px;
+}
+
+
+/* Heading */
+h1, h2, h3, h4, h5, h6 {
+    font-family: Linik-Bold;
+}
+
+
+/* Container start */
+.container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin-bottom: 60px;
+}
+/* Container end */
+
+
+/* Content start */
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+/* Content end */
+
+
+/* General Information start */
+.general-information-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.general-information {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 100px;
+}
+
+.general-information .card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    border-radius: 20px;
+    padding: 20px;
+    background-color: #252527;
+}
+
+.general-information .card .card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.general-information .card .card-left .top h2 {
+    font-family: Linik-Regular;
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.general-information .card .card-left .top p {
+    font-family: Linik-Regular;
+    font-size: 16px;
+    color: #B3B3B3;
+    text-transform: uppercase;
+}
+
+.general-information .card .card-left p {
+    font-family: Linik-Medium;
+    font-size: 24px;
+    color: #E38F25;
+}
+/* General Information end */
+
+
+/* Most popular products start */
+.most-popular-products-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.most-popular-products {
+    padding: 0 20px 0px 20px;
+    border-radius: 20px;
+    background-color: #252527;
+}
+
+.most-popular-products table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 20px;
+    text-align: left;
+}
+
+.most-popular-products table th {
+    font-weight: 400;
+    padding: 0 0 20px 0;
+    color: #B3B3B3;
+    border-bottom: 2px solid #202022;
+}
+
+.most-popular-products table .product {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.most-popular-products table .product img {
+    width: 50px;
+    margin-right: 20px;
+}
+
+.most-popular-products table .total-revenue {
+    font-family: Linik-Medium;
+    color: #E38F25;
+}
+/* Most popular products end */
+
+
+/* Recent Payments start */
+.recent-payments-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.recent-payments {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 100px;
+}
+
+.recent-payments .recent-payments-left, .recent-payments-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+}
+
+.recent-payments .no-recent-payments {
+    text-align: center;
+}
+
+.recent-payments .card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #252527;
+}
+
+.recent-payments .card .left {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
+
+.recent-payments .card .left img {
+    width: 50px;
+}
+
+.recent-payments .card .left .buyer-information {
+    display: flex;
+    flex-direction: column;
+}
+
+.recent-payments .card .left .buyer-information p {
+    font-size: 24px;
+}
+
+.recent-payments .card .left .buyer-information .date {
+    font-size: 16px;
+    color: #B3B3B3;
+}
+
+.recent-payments .card .status {
+    padding: 10px 20px;
+    border-radius: 100px;
+}
+
+.recent-payments .card .green {
+    color: #07B80E;
+    background-color: #3CFA94;
+}
+
+.recent-payments .card .orange {
+    color: #AD9C06;
+    background-color: #F8F36F;
+}
+/* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */

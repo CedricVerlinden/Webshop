@@ -1,0 +1,133 @@
+@font-face {
+    font-family: Linik-Black;
+    src: url('../fonts/LinikSans-Black.ttf');
+}
+
+@font-face {
+    font-family: Linik-Bold;
+    src: url('../fonts/LinikSans-Bold.ttf');
+}
+
+@font-face {
+    font-family: Linik-Medium;
+    src: url('../fonts/LinikSans-Medium.ttf');
+}
+
+@font-face {
+    font-family: Linik-Regular;
+    src: url('../fonts/LinikSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: Linik-Light;
+    src: url('../fonts/LinikSans-Light.ttf');
+}
+
+@font-face {
+    font-family: Linik-Thin;
+    src: url('../fonts/LinikSans-Thin.ttf');
+}
+
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    transition: ease-in-out .2s;
+    transition: background-color none;
+}
+
+body {
+    display: block;
+    font-family: Linik-Regular;
+    font-size: 16px;
+    background-color: #1B1B1D;
+    color: #ffffff;
+    padding: 0px 70px;
+}
+
+
+/* Heading */
+h1, h2, h3, h4, h5, h6 {
+    font-family: Linik-Bold;
+}
+
+
+/* Container start */
+.container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin-bottom: 60px;
+}
+/* Container end */
+
+
+/* Product start */
+.products {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 40px;
+    height: 100%;
+}
+
+.no-products {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+}
+
+.product {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+    height: 400px;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #252527;
+}
+
+.product img {
+    width: 256px;
+    margin-bottom: 10px;
+}
+
+.product p {
+    font-family: Linik-Medium;
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.product .platform {
+    font-size: 13px;
+    color: #8C8C8E;
+    text-transform: uppercase;
+}
+
+.product .product-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product .product-bottom .price {
+    font-family: Linik-Medium;
+    font-size: 24px;
+    color: #E38F25;
+}
+
+.product .product-bottom button {
+    padding: 10px 70px;
+}
+
+.product .product-bottom button:hover {
+    background-color: #ffffff;
+    color: #E38F25;
+    cursor: pointer;
+}
+/* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */

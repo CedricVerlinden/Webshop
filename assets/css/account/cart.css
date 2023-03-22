@@ -1,0 +1,158 @@
+@font-face {
+    font-family: Linik-Black;
+    src: url('../../fonts/LinikSans-Black.ttf');
+}
+
+@font-face {
+    font-family: Linik-Bold;
+    src: url('../../fonts/LinikSans-Bold.ttf');
+}
+
+@font-face {
+    font-family: Linik-Medium;
+    src: url('../../fonts/LinikSans-Medium.ttf');
+}
+
+@font-face {
+    font-family: Linik-Regular;
+    src: url('../../fonts/LinikSans-Regular.ttf');
+}
+
+@font-face {
+    font-family: Linik-Light;
+    src: url('../../fonts/LinikSans-Light.ttf');
+}
+
+@font-face {
+    font-family: Linik-Thin;
+    src: url('../../fonts/LinikSans-Thin.ttf');
+}
+
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    transition: ease-in-out .2s;
+    transition: background-color none;
+}
+
+body {
+    display: block;
+    font-family: Linik-Regular;
+    font-size: 16px;
+    background-color: #1B1B1D;
+    color: #ffffff;
+    padding: 0px 70px;
+}
+
+
+/* Heading */
+h1, h2, h3, h4, h5, h6 {
+    font-family: Linik-Bold;
+}
+
+
+.cart-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+}
+
+.cart .left {
+    align-self: flex-start;
+    flex: 2;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #252527;
+}
+
+.cart .left table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 20px;
+    text-align: left;
+}
+
+.cart .left table th {
+    font-weight: 400;
+    padding: 0 0 20px 0;
+    color: #B3B3B3;
+    border-bottom: 2px solid #202022;
+}
+
+.cart .left table .product {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+
+.cart .left table .product img {
+    width: 50px;
+}
+
+.cart .right {
+    flex: 1;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: #252527;
+}
+
+.cart .right form {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.cart .right form .input {
+    display: flex;
+    flex-direction: column;
+    /* gap: 50px; */
+}
+
+.cart .right form .input label {
+    font-family: Linik-Medium;
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.cart .right form .input input {
+    padding: 15px 10px;
+    margin-bottom: 50px;
+    border-radius: 10px;
+    border: 2px solid #808080;
+    background-color: #252527;
+    color: #ffffff;
+    font-size: 20px;
+    outline: none;
+}
+
+.cart .right form .input .sub {
+    font-size: 24px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.cart .right form .input .total {
+    font-family: Linik-Bold;
+    margin-top: 10px;
+    margin-bottom: 0;
+    color: #e38f25;
+}
+/* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */
