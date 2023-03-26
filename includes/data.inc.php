@@ -836,15 +836,11 @@ function getCartTotalProducts($id) {
     $resultSet = $connection->query($sql);
 
     if (mysqli_num_rows($resultSet) == null) {
-        return;
+        return 0;
     }
 
     $row = $resultSet->fetch_assoc();
     $cart = $row["cart"];
-
-    if (empty($cart)) {
-        return 0;
-    }
 
     $cart = trim($cart, ',');
 
