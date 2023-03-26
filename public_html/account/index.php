@@ -9,7 +9,8 @@ if (!(isset($_SESSION["userid"]))) {
 }
 
 if (isset($_POST["change-account"])) {
-    updateUserAccount($_SESSION["userid"], $_POST["email"], $_POST["password"], $_POST["country"], $_POST["state"], $_POST["street"], $_POST["number"]);
+    $userId = $_POST["userid"];
+    updateUser($connection, $userId, $_POST["email"], $_POST["password"], (isUserAdmin($connection, $_SESSION["userid"]) ? "1" : "0"), $_POST["country"], $_POST["state"], $_POST["street"], $_POST["number"]);
 }
 ?>
 
@@ -19,7 +20,6 @@ if (isset($_POST["change-account"])) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/0489e35579.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../../assets/css/account/index.css">
     <link rel="stylesheet" href="../../assets/css/header.css">
     <link rel="stylesheet" href="../../assets/css/footer.css">
@@ -86,26 +86,27 @@ if (isset($_POST["change-account"])) {
                 <h1>Personal Information</h1>
                 <div class="personal-information">
                     <form action="./index.php" method="post">
+                        <input type="hidden" name="userid" value=<?php echo $_SESSION["userid"] ?>>
                         <div class="input">
                             <div class="left">
                                 <label for="email">Email</label>
-                                <input type="email" name="email" id="email" value="<?php echo getUserEmail($_SESSION["userid"]) ?>">
+                                <input type="email" name="email" id="email" value="<?php echo getUserEmail($connection, $_SESSION["userid"]) ?>">
 
                                 <label for="country">Country</label>
-                                <input type="text" name="country" id="country" value=<?php echo (getUserCountry($_SESSION["userid"] !== false) ? "" . getUserCountry($_SESSION["userid"]) . "" : "") ?>>
+                                <input type="text" name="country" id="country" value=<?php echo (getUserCountry($connection, $_SESSION["userid"]) !== false) ? "" . getUserCountry($connection, $_SESSION["userid"]) . "" : "" ?>>
 
                                 <label for="street">Street</label>
-                                <input type="text" name="street" id="street" value=<?php echo (getUserCountry($_SESSION["userid"] !== false) ? "" . getUserStreet($_SESSION["userid"]) . "" : "") ?>>
+                                <input type="text" name="street" id="street" value=<?php echo (getUserStreet($connection, $_SESSION["userid"]) !== false) ? "" . getUserStreet($connection, $_SESSION["userid"]) . "" : "" ?>>
                             </div>
                             <div class="right">
                                 <label for="password">New Password</label>
                                 <input type="password" name="password" id="password">
 
                                 <label for="state">State</label>
-                                <input type="text" name="state" id="state" value=<?php echo (getUserState($_SESSION["userid"]) !== false) ? "" . getUserState($_SESSION["userid"]) . "" : "" ?>>
+                                <input type="text" name="state" id="state" value=<?php echo (getUserState($connection, $_SESSION["userid"]) !== false) ? "" . getUserState($connection, $_SESSION["userid"]) . "" : "" ?>>
 
                                 <label for="house-number">House Number</label>
-                                <input type="text" name="number" id="house-number" value=<?php echo (getUserNumber($_SESSION["userid"]) !== false) ? "" . getUserNumber($_SESSION["userid"]) . "" : "" ?>>
+                                <input type="text" name="number" id="house-number" value=<?php echo (getUserHouseNumber($connection, $_SESSION["userid"]) !== false) ? "" . getUserHouseNumber($connection, $_SESSION["userid"]) . "" : "" ?>>
                             </div>
                         </div>
                         <input class="button" type="submit" name="change-account" value="Save">

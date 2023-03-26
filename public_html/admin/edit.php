@@ -25,21 +25,21 @@ if ($type == "create") {
 
 if ($type == "edit" || $type == "delete") {
     if (isset($_GET["product"])) {
-        if (!(($type == "edit" || $type == "delete") && doesProductExistById($_GET["product"]))) {
+        if (!(($type == "edit" || $type == "delete") && doesProductExist($connection, $_GET["product"]))) {
             header("Location: ./");
             return;
         }
     }
     
     if (isset($_GET["category"])) {
-        if (!(($type == "edit" || $type == "delete") && doesCategoryExistById($_GET["category"]))) {
+        if (!(($type == "edit" || $type == "delete") && doesCategoryExist($connection, $_GET["category"]))) {
             header("Location: ./");
             return;
         }
     }
 
     if (isset($_GET["user"])) {
-        if (!(($type == "edit" || $type == "delete") && doesUserExistById($_GET["user"]))) {
+        if (!(($type == "edit" || $type == "delete") && doesUserExistById($connection, $_GET["user"]))) {
             header("Location: ./");
             return;
         }
@@ -65,19 +65,19 @@ if ($type == "edit" || $type == "delete") {
         $type = $_GET["type"];
 
         if (isset($_POST["create-product"])) {
-            createProduct($_POST["category"], $_POST["name"], $_POST["platform"], $_POST["price"], $_POST["image"]);
+            createProduct($connection, $_POST["category"], $_POST["name"], $_POST["platform"], $_POST["price"], $_POST["image"]);
             header("Location: ./products.php"); 
             exit();
         }
 
         if (isset($_POST["edit-product"])) {
-            updateProduct($_POST["id"], $_POST["category"], $_POST["name"], $_POST["platform"], $_POST["price"], $_POST["image"]);
+            updateProduct($connection, $_POST["category"], $_POST["name"], $_POST["platform"], $_POST["price"], $_POST["image"]);
             header("Location: ./products.php"); 
             exit();
         }
 
         if (isset($_POST["delete-product"])) {
-            deleteProduct($_POST["id"]);
+            deleteProduct($connection, $_POST["id"]);
             header("Location: ./products.php");
             exit();
         }
@@ -88,7 +88,7 @@ if ($type == "edit" || $type == "delete") {
         }
 
         if (isset($_POST["create-category"])) {
-            if (createCategory($_POST["name"])) {
+            if (createCategory($connection, $_POST["name"])) {
                 header("Location: ./categories.php");
                 exit();
             } else {
@@ -99,13 +99,13 @@ if ($type == "edit" || $type == "delete") {
         }
 
         if (isset($_POST["edit-category"])) {
-            updateCategory($_POST["id"], $_POST["name"]);
+            updateCategory($connection, $_POST["id"], $_POST["name"]);
             header("Location: ./categories.php");
             exit();
         }
 
         if (isset($_POST["delete-category"])) {
-            deleteCategory($_POST["id"]);
+            deleteCategory($connection, $_POST["id"]);
             header("Location: ./categories.php");
             exit();
         }
@@ -116,24 +116,24 @@ if ($type == "edit" || $type == "delete") {
         }
 
         if (isset($_POST["create-user"])) {
-            if (createUser($_POST["name"], $_POST["password"])) {
+            if (createUser($connection, $_POST["email"], $_POST["password"], $_POST["admin"])) {
                 header("Location: ./customers.php");
                 exit();
             } else {
                 echo "User already exists!";
             }
-            // header("Location: ./customers.php");
+            header("Location: ./customers.php");
             exit();
         }
 
         if (isset($_POST["edit-user"])) {
-            updateUser($_POST["id"], $_POST["name"], $_POST["password"], $_POST["admin"]);
+            updateUser($connection, $_POST["id"], $_POST["email"], $_POST["password"], $_POST["admin"], "", "", "", "");
             header("Location: ./customers.php");
             exit();
         }
 
         if (isset($_POST["delete-user"])) {
-            deleteUser($_POST["id"]);
+            deleteUser($connection, $_POST["id"]);
             header("Location: ./customers.php");
             exit();
         }
@@ -144,7 +144,6 @@ if ($type == "edit" || $type == "delete") {
         }
         
         if ($type == "create") {
-            // add this to header
             if (isset($_GET["product"]) && $_GET["product"] == "new") {
                 ?>
                 <div class="navigation">
@@ -170,10 +169,10 @@ if ($type == "edit" || $type == "delete") {
                             <input type="text" name="image" id="image" required>
 
                             <label for="platform">For which platform is this?</label>
-                            <?php echo getPlatformList() ?>
+                            <?php echo displayPlatforms($connection) ?>
 
                             <label for="category">In which category should it be placed?</label>
-                            <?php echo getCategoryList() ?>
+                            <?php echo displayCategories($connection) ?>
         
                             <input type="submit" name="create-product" value="Create Product">
                         </form>
@@ -225,8 +224,11 @@ if ($type == "edit" || $type == "delete") {
                             <label for="email">What is the email of the user?</label>
                             <input type="email" name="email" id="email" required>
 
-                            <label for="admin">Is this user an administrator?</label> <!-- TODO -->
-                            <input type="text" name="admin" id="admin" required>
+                            <label for="admin">Is this user an administrator?</label>
+                            <select name="admin" id="admin">
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
 
                             <label for="password">What will the temporary password be?</label>
                             <input type="password" name="password" id="password" required>
@@ -262,7 +264,7 @@ if ($type == "edit" || $type == "delete") {
                     <a href="./products.php"><i class="fa-solid fa-arrow-left"></i></a>
                 </div>
                 <div class="navigation-center">
-                    <h1>Editing "<?php echo getProductName($product) ?>"</h1>
+                    <h1>Editing "<?php echo getProductName($connection, $product) ?>"</h1>
                 </div>
                 <div style="flex:1"></div>
                 </div>
@@ -282,10 +284,10 @@ if ($type == "edit" || $type == "delete") {
                             <input type="text" name="image" id="image" value="<?php echo $row["image"] ?>" required>
         
                             <label for="platform">For which platform is this?</label>
-                            <?php echo getPlatformList() ?>
+                            <?php echo displayPlatforms($connection) ?>
         
                             <label for="category">In which category should it be placed?</label>
-                            <?php echo getCategoryList() ?>
+                            <?php echo displayCategories($connection) ?>
         
                             <input type="submit" name="edit-product" value="Update Product">
                         </form>
@@ -317,7 +319,7 @@ if ($type == "edit" || $type == "delete") {
                     <a href="categories.php"><i class="fa-solid fa-arrow-left"></i></a>
                 </div>
                 <div class="navigation-center">
-                    <h1>Editing "' . getCategoryName($category) . '"</h1>
+                    <h1>Editing "' . getCategoryName($connection, $category) . '"</h1>
                 </div>
                 <div style="flex:1"></div>
                 </div>
@@ -359,7 +361,7 @@ if ($type == "edit" || $type == "delete") {
                     <a href="./customers.php"><i class="fa-solid fa-arrow-left"></i></a>
                 </div>
                 <div class="navigation-center">
-                    <h1>Editing "<?php echo getUserEmail($user) ?>"</h1>
+                    <h1>Editing "<?php echo getUserEmail($connection, $user) ?>"</h1>
                 </div>
                 <div style="flex:1"></div>
                 </div>
@@ -368,8 +370,8 @@ if ($type == "edit" || $type == "delete") {
                     <div class="left">
                         <form action="./edit.php?type=edit&user=<?php echo $user ?>" method="post">
                             <input type="hidden" name="id" value="<?php echo $user ?>">
-                            <label for="name">What is the email of the user?</label>
-                            <input type="text" name="name" id="name" value="<?php echo $row["email"] ?>">
+                            <label for="email">What is the email of the user?</label>
+                            <input type="text" name="email" id="name" value="<?php echo $row["email"] ?>">
 
                             <label for="admin">Is this user an administrator?</label>
                             <select name="admin" id="admin">
@@ -422,7 +424,7 @@ if ($type == "edit" || $type == "delete") {
                     <a href="./products.php"><i class="fa-solid fa-arrow-left"></i></a>
                 </div>
                 <div class="navigation-center">
-                    <h1>Editing "' . getProductName($product) . '"</h1>
+                    <h1>Editing "' . getProductName($connection, $product) . '"</h1>
                 </div>
                 <div style="flex:1"></div>
                 </div>
@@ -463,7 +465,7 @@ if ($type == "edit" || $type == "delete") {
                     <a href="./categories.php"><i class="fa-solid fa-arrow-left"></i></a>
                 </div>
                 <div class="navigation-center">
-                    <h1>Editing "' . getCategoryName($category) . '"</h1>
+                    <h1>Editing "' . getCategoryName($connection, $category) . '"</h1>
                 </div>
                 <div style="flex:1"></div>
                 </div>
@@ -504,7 +506,7 @@ if ($type == "edit" || $type == "delete") {
                     <a href="./customers.php"><i class="fa-solid fa-arrow-left"></i></a>
                 </div>
                 <div class="navigation-center">
-                    <h1>Editing "' . getUserEmail($user) . '"</h1>
+                    <h1>Editing "' . getUserEmail($connection, $user) . '"</h1>
                 </div>
                 <div style="flex:1"></div>
                 </div>
@@ -529,4 +531,31 @@ if ($type == "edit" || $type == "delete") {
     </div>
 </body>
 </html>
+<?php
+function displayPlatforms($connection) {
+    if (!(getAllPlatforms($connection))) {
+        noData("platforms");
+        return;
+    }
+    
+    echo '<select style="text-transform:uppercase" name="platform" id="platform">';
+    foreach (getAllPlatforms($connection) as $row) {
+        echo '<option value="' . $row["id"] . '">' . strtoupper($row["name"]) . '</option>';
+    }
+    echo '</select>';
+}
+
+function displayCategories($connection) {
+    if (!(getAllCategories($connection))) {
+        noData("categories");
+        return;
+    }
+    
+    echo '<select name="category" id="category">';
+    foreach (getAllCategories($connection) as $row) {
+        echo '<option value="' . $row["id"] . '">' . $row["name"] . '</option>';
+    }
+    echo '</select>';
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

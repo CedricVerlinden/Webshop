@@ -87,7 +87,7 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
                         <button name="new-user">New User</button>
                     </form>
                 </div>
-                <?php getAllUsers(); ?>
+                <?php displayUsers($connection); ?>
             </div>
         </div>
         
@@ -138,4 +138,47 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
     </div>
 </body>
 </html>
+<?php
+function displayUsers($connection) {
+    if (!(getAllUsers($connection))) {
+        noData("users");
+        return;
+    }
+
+    echo '
+    <div class="customers">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Admin</th>
+                <th></th>
+                <th></th>
+            </tr>
+    ';
+    foreach(getAllUsers($connection) as $row) {
+        echo '
+            <tr>
+                <td>' . $row["id"] . '</td>
+                <td>' . $row["email"] . '</td>
+                <td>' . ($row["admin"] == 1 ? 'Yes' : 'No') . '</td>
+                <td style="text-align:right; width:1%">
+                    <form action="./edit.php?type=edit&user=' . $row["id"] . '" method="post">
+                        <button style="margin-right:20px" class="edit" name="edit">Edit</button>
+                    </form>
+                </td>
+                <td style="text-align:right; width:1%">
+                    <form action="./edit.php?type=delete&user=' . $row["id"] . '" method="post">
+                        <button class="delete" name="delete">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        ';
+    }
+    echo '
+        </table>
+    </div>
+    ';
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

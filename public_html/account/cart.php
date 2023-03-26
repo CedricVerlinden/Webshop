@@ -9,11 +9,11 @@ if (!(isset($_SESSION["userid"]))) {
 }
 
 if (isset($_POST["add-product"])) {
-    addProductToCart($_SESSION["userid"], $_POST["product_id"]);
+    addProductToCart($connection, $_SESSION["userid"], $_POST["product_id"]);
 }
 
 if (isset($_POST["remove-product"])) {
-    removeProductFromCart($_SESSION["userid"], $_POST["product_id"]);
+    removeProductFromCart($connection, $_SESSION["userid"], $_POST["product_id"]);
 }
 ?>
 
@@ -93,20 +93,20 @@ if (isset($_POST["remove-product"])) {
                 </div>
                 <div class="cart">
                     <div class="left">
-                        <?php getCartProducts($_SESSION["userid"]); ?>
+                        <?php displayProducts($connection); ?>
                     </div>
                     <div class="right">
                         <form action="./checkout.php" method="post">
                             <div class="input">
                                 <label for="email">Email</label>
-                                <input type="email" name="email" id="email" value="<?php echo getUserEmail($_SESSION["userid"]) ?>">
+                                <input type="email" name="email" id="email" value="<?php echo getUserEmail($connection, $_SESSION["userid"]) ?>">
 
                                 <div class="sub">
                                     <p>Subtotal</p>
-                                    <p>€<?php echo getCartTotal($_SESSION["userid"]) ?></p>
+                                    <p>€<?php echo getCartTotal($connection, $_SESSION["userid"]) ?></p>
                                 </div>
 
-                                <?php $btw =  getCartTotal($_SESSION["userid"]) * 0.21; ?>
+                                <?php $btw =  getCartTotal($connection, $_SESSION["userid"]) * 0.21; ?>
 
                                 <div class="sub">
                                     <p>BTW (21%)</p>
@@ -115,12 +115,12 @@ if (isset($_POST["remove-product"])) {
 
                                 <div class="sub total">
                                     <p>Total</p>
-                                    <p>€<?php echo (getCartTotal(($_SESSION["userid"])) + $btw) ?></p>
+                                    <p>€<?php echo (getCartTotal($connection, $_SESSION["userid"]) + $btw) ?></p>
                                 </div>
                             </div>
-                            <input type="hidden" name="subtotal" value="<?php echo getCartTotal($_SESSION["userid"]) ?>">
+                            <input type="hidden" name="subtotal" value="<?php echo getCartTotal($connection, $_SESSION["userid"]) ?>">
                             <input type="hidden" name="btw" value="<?php echo $btw ?>">
-                            <input type="hidden" name="total" value="<?php echo getCartTotal(($_SESSION["userid"])) + $btw ?>">
+                            <input type="hidden" name="total" value="<?php echo getCartTotal($connection, $_SESSION["userid"]) + $btw ?>">
                             <input class="button" type="submit" name="checkout" value="Checkout">
                         </form>
                     </div>
@@ -175,4 +175,53 @@ if (isset($_POST["remove-product"])) {
     </div>
 </body>
 </html>
+<?php
+function displayProducts($connection) {
+    if (!(getAllCartProducts($connection, $_SESSION["userid"]))) {
+        noData("cart");
+        return;
+    }
+
+    $products = explode(",", getAllCartProducts($connection, $_SESSION["userid"]));
+    $productsCount = array_count_values($products);
+
+    echo '
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Amount</th>
+            <th></th>
+            <th></th>
+        </tr>
+    ';
+    foreach($productsCount as $product => $quantity) {
+        echo '
+        <tr>
+            <td class="product">
+                <img src="' . getProductImage($connection, $product) . '">
+                <p>' . getProductName($connection, $product) . '</p>
+            </td>
+            <td>€' . getProductPrice($connection, $product) . '</td>
+            <td>
+                <span class="product-count">' . $quantity . '</span>
+            </td>
+            <td style="text-align:right; width:1%">
+                <form action="./cart.php" method="post">
+                    <input type="hidden" name="product_id" value="' . $product . '">
+                    <button style="margin-right:20px" name="add-product" value="' . $product . '">+</button>
+                </form>
+            </td>
+            <td style="text-align:right; width:1%">
+                <form action="./cart.php" method="post">
+                    <input type="hidden" name="product_id" value="' . $product . '">
+                    <button name="remove-product" value="' . $product . '">-</button>
+                </form>
+            </td>
+        </tr>
+        ';
+    }
+    echo '</table>';
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

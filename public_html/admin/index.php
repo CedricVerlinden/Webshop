@@ -100,7 +100,7 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
                                 <h2>Revenue Generated</h2>
                                 <p>Last 24h</p>
                             </div>
-                            <?php totalRevenueOfLastDay(); ?>
+                            <?php getTotalPriceOfLastDayOrders(); ?>
                         </div>
                         <div class="card-right">
                             <img src="../../assets/images/graph.svg" alt="">

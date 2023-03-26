@@ -1,792 +1,473 @@
 <?php
 include 'connect.inc.php';
 
-// User data
-function createUser($email, $password) {
-    global $connection;
+function noData($data) {
+    echo '
+    <div class="no-data">
+        <p>There is no ' . $data . ' data.</p>
+    </div>
+    ';
+}
 
-    if (doesUserExistByEmail($email)) {
-        return false;
-    }
 
-    $sql = "INSERT INTO users (email, password, admin) VALUES (?, ?, 0);";
+// Addresses data
+function getAllAddresses($connection) {
+    $sql = "SELECT * FROM addresses;";
+    $resultSet = $connection->query($sql);
+
+    return ($resultSet->num_rows == null) ? noData("addresses") : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getUserAddress($connection, $userId) {
+    $sql = "SELECT * FROM addresses WHERE user=?;";
     $statement = $connection->prepare($sql);
 
     if (!$statement) {
-        die("Error: " . $connection->error);
+        die("MySQL Statement Error: " . $connection->error);
+    }
+
+    $statement->bind_param("i", $userId);
+    $statement->execute();
+
+    $result = $statement->get_result();
+    return $result->fetch_assoc();
+}
+
+function getUserCountry($connection, $userId) {
+    return (getUserAddress($connection, $userId) == null) ? false : getUserAddress($connection, $userId)["country"];
+}
+
+function getUserState($connection, $userId) {
+    return (getUserAddress($connection, $userId) == null) ? false : getUserAddress($connection, $userId)["state"];
+}
+
+function getUserStreet($connection, $userId) {
+    return (getUserAddress($connection, $userId) == null) ? false : getUserAddress($connection, $userId)["street"];
+}
+
+function getUserHouseNumber($connection, $userId) {
+    return (getUserAddress($connection, $userId) == null) ? false : getUserAddress($connection, $userId)["number"];
+}
+
+
+// Categories data
+function getAllCategories($connection) {
+    $sql = "SELECT * FROM categories;";
+    $resultSet = $connection->query($sql);
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getCategoryId($connection, $categoryName) {
+    $sql = "SELECT * FROM categories WHERE name=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("s", $categoryName);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return $resultSet->num_rows > 0 ? $resultSet->fetch_assoc()["id"] : false;
+}
+
+function getCategoryName($connection, $categoryId) {
+    $sql = "SELECT * FROM categories WHERE id=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $categoryId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["name"];
+}
+
+function doesCategoryExist($connection, $categoryName) {
+    $sql = "SELECT * FROM categories WHERE name=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("s", $categoryName);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows != 0);
+}
+
+function createCategory($connection, $categoryName) {
+    $sql = "INSERT INTO categories (name) VALUES (?);";
+    
+    if (doesCategoryExist($connection, $categoryName)) {
+        return false;
+    }
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("s", $categoryName);
+    $statement->execute();
+    return true;
+}
+
+function updateCategory($connection, $categoryId, $categoryName) {
+    $sql = "UPDATE categories SET name=? WHERE id=?;";
+    
+    if (!(getCategoryName($connection, $categoryName))) {
+        return false;
+    }
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("si", $categoryName, $categoryId);
+    $statement->execute();
+    return true;
+}
+
+function deleteCategory($connection, $categoryId) {
+    $sql = "DELETE FROM categories WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $categoryId);
+    $statement->execute();
+    return true;
+}
+
+
+// Orders data
+function getAllOrders($connection) {
+    $sql = "SELECT * FROM orders;";
+    $resultSet = $connection->query($sql);
+
+    if (mysqli_num_rows($resultSet) == null) {
+        echo '
+        <div class="no-data">
+            <p>There is no orders data.</p>
+        </div>
+        ';
+        return false;
+    }
+
+    return $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getUserOrders($connection, $userId) {
+    $sql = "SELECT * FROM orders WHERE user=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $userId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getUserOrdersByStatus($connection, $userId, $status) {
+    $sql = "SELECT * FROM orders WHERE user=? AND status=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("ii", $userId, $status);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+
+// Platforms data
+function getAllPlatforms($connection) {
+    $sql = "SELECT * FROM platforms;";
+    $resultSet = $connection->query($sql);
+
+    return ($resultSet->num_rows == null) ? noData("platforms") : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getPlatformName($connection, $platformId) {
+    $sql = "SELECT * FROM platforms WHERE id=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $platformId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["name"];
+}
+
+
+// Products data
+function getAllProducts($connection) {
+    $sql = "SELECT * FROM products;";
+    $resultSet = $connection->query($sql);
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getAllProductsByCategory($connection, $category) {
+    $sql = "SELECT * FROM products where category=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $category);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getProductName($connection, $productId) {
+    $sql = "SELECT * FROM products WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $productId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["name"];
+}
+
+function getProductPrice($connection, $productId) {
+    $sql = "SELECT * FROM products WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $productId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["price"];
+}
+
+function getProductImage($connection, $productId) {
+    $sql = "SELECT * FROM products WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $productId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["image"];
+}
+
+function doesProductExist($connection, $productId) {
+    $sql = "SELECT * FROM products WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $productId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : true;
+}
+
+function createProduct($connection, $categoryId, $productName, $productPlatform, $productPrice, $productImage) {
+    $sql = "INSERT INTO products (category, name, platform, price, image) VALUES (?, ?, ?, ?,?);";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("isiis", $categoryId, $productName, $productPlatform, $productPrice, $productImage);
+    $statement->execute();
+}
+
+function updateProduct($connection, $categoryId, $productName, $productPlatform, $productPrice, $productImage) {
+    $sql = "UPDATE products SET category=?, name=?, platform=?, price=?, image=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("isiis", $categoryId, $productName, $productPlatform, $productPrice, $productImage);
+    $statement->execute();
+}
+
+function deleteProduct($connection, $productId) {
+    $sql = "DELETE FROM products WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $productId);
+    $statement->execute();
+}
+
+
+// Users data
+function getAllUsers($connection) {
+    $sql = "SELECT * FROM users;";
+    $resultSet = $connection->query($sql);
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_all(MYSQLI_ASSOC);
+}
+
+function getUserEmail($connection, $userId) {
+    $sql = "SELECT * FROM users WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $userId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["email"];
+}
+
+function doesUserExistById($connection, $userId) {
+    $sql = "SELECT * FROM users WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $userId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows != 0);
+}
+
+function doesUserExistByEmail($connection, $email) {
+    $sql = "SELECT * FROM users WHERE email=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("s", $email);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows != 0);
+}
+
+function isUserAdmin($connection, $userId) {
+    $sql = "SELECT * FROM users WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $userId);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->fetch_assoc()["admin"] == 1) ? true : false;
+}
+
+function createUser($connection, $email, $password, $admin) {
+    $sql = "INSERT INTO users (email, password, admin) VALUES (?, ?, ?);";
+
+    if (doesUserExistByEmail($connection, $email)) {
+        return false;
     }
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    $statement->bind_param("ss", $email, $hashedPassword);
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("ssi", $email, $hashedPassword, $admin);
     $statement->execute();
     return true;
+    
 }
 
-function updateUser($id, $email, $password, $admin) {
-    global $connection;
+function updateUser($connection, $userId, $email, $password, $admin, $country, $state, $street, $number) {
+    $addressSql = "INSERT INTO addresses (user, country, state, street, number) VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE country=?, state=?, street=?, number=?";
 
-    if (empty($password)) {
-        $sql = "UPDATE users SET email=?, admin=? WHERE id=?;";
-        $statement = $connection->prepare($sql);
-
-        if (!$statement) {
-            die("Error: " . $connection->error);
-        }
-
-        $statement->bind_param("sii", $email, $admin, $id);
-        $statement->execute();
-    } else {
-        $sql = "UPDATE users SET email=?, password=?, admin=? WHERE id=?;";
-        $statement = $connection->prepare($sql);
-
-        if (!$statement) {
-            die("Error: " . $connection->error);
-        }
+    if (!(empty($password))) {
+        $userSql = "UPDATE users SET email=?, password=?, admin=? WHERE id=?;";
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        $statement->bind_param("ssii", $email, $hashedPassword, $admin, $id);
-        $statement->execute();
-    }
-}
-
-function updateUserAccount($id, $email, $password, $country, $state, $street, $number) {
-    global $connection;
-
-    if (empty($password)) {
-        $sql = "UPDATE users SET email=? WHERE id=?;";
-        $statement = $connection->prepare($sql);
-
-        if (!$statement) {
-            die("Error: " . $connection->error);
-        }
-
-        $statement->bind_param("si", $email, $id);
-        $statement->execute();
+        $userStatement = $connection->prepare($userSql);
+        $userStatement->bind_param("ssii", $email, $hashedPassword, $admin, $userId);
     } else {
-        $sql = "UPDATE users SET email=?, password=? WHERE id=?;";
-        $statement = $connection->prepare($sql);
+        $userSql = "UPDATE users SET email=?, admin=? WHERE id=?;";
 
-        if (!$statement) {
-            die("Error: " . $connection->error);
-        }
-
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        $statement->bind_param("ssi", $email, $hashedPassword, $id);
-        $statement->execute();
+        $userStatement = $connection->prepare($userSql);
+        $userStatement->bind_param("sii", $email, $admin, $userId);
     }
 
-    $sql = "INSERT INTO addresses(user, country, state, street, number) VALUES(?,?,?,?,?) ON DUPLICATE KEY UPDATE country=?, state=?, street=?, number=?";
-    $statement = $connection->prepare($sql);
+    $userStatement->execute();
 
-    if (!$statement) {
-        die("Error: " . $connection->error);
+    if (!(empty($country) && empty($state) && empty($street) && empty($number))) {
+        $addressStatement = $connection->prepare($addressSql);
+        $addressStatement->bind_param("isssisssi", $userId, $country, $state, $street, $number, $country, $state, $street, $number);
+        $addressStatement->execute();
     }
-
-    $statement->bind_param("issssssss", $id, $country, $state, $street, $number, $country, $state, $street, $number);
-    $statement->execute();
 }
 
-function deleteUser($id) {
-    global $connection;
-
+function deleteUser($connection, $userId) {
     $sql = "DELETE FROM users WHERE id=?;";
+
     $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
+    $statement->bind_param("i", $userId);
     $statement->execute();
 }
 
-function getAllUsers() {
-    global $connection;
 
-    $sql = "SELECT * FROM users";
-    $resultSet = $connection->query($sql);
+// Cart data
+function getAllCartProducts($connection, $userId) {
+    $sql = "SELECT cart FROM users WHERE id=?;";
 
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '
-        <div class="no-users">
-            <p>There are no users available.</p>
-        </div>
-        ';
-        return;
-    }
-    
-    echo '
-    <div class="customers">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Email</th>
-                <th>Admin</th>
-                <th></th>
-                <th></th>
-            </tr>
-    ';
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '
-            <tr>
-                <td>' . $row["id"] . '</td>
-                <td>' . $row["email"] . '</td>
-                <td>' . ($row["admin"] == 1 ? 'Yes' : 'No') . '</td>
-                <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=edit&user=' . $row["id"] . '" method="post">
-                        <button style="margin-right:20px" class="edit" name="edit">Edit</button>
-                    </form>
-                </td>
-                <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=delete&user=' . $row["id"] . '" method="post">
-                        <button class="delete" name="delete">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        ';
-    }
-    echo '
-        </table>
-    </div>
-    ';
-}
-
-function getUserEmail($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM users WHERE id=?";
     $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
+    $statement->bind_param("i", $userId);
     $statement->execute();
-
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    return $row["email"];
-}
-
-function doesUserExistByEmail($email) {
-    global $connection;
-
-    $sql = "SELECT * FROM users WHERE email=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("s", $email);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    return $row != null;
-}
-
-function doesUserExistById($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM users WHERE id=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    return $row != null;
-}
-
-// Adress data
-function getUserCountry($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM addresses WHERE user=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    if ($row == null) {
-        return false;
-    }
-
-    return $row["country"];
-}
-
-function getUserState($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM addresses WHERE user=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    if ($row == null) {
-        return false;
-    }
-
-    return $row["state"];
-}
-
-function getUserStreet($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM addresses WHERE user=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    if ($row == null) {
-        return false;
-    }
-
-    return $row["street"];
-}
-
-function getUserNumber($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM addresses WHERE user=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    if ($row == null) {
-        return false;
-    }
-
-    return $row["number"];
-}
-
-
-// Category data
-function createCategory($name) {
-    global $connection;
-
-    if (doesCategoryExistByName($name)) {
-        return false;
-    }
-
-    $sql = "INSERT INTO categories (name) VALUES (?);";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("s", $name);
-    $statement->execute();
-    return true;
-}
-
-function updateCategory($id, $name) {
-    global $connection;
-
-    $sql = "UPDATE categories SET name=? WHERE id=?;";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("si", $name, $id);
-    $statement->execute();
-}
-
-function deleteCategory($id) {
-    global $connection;
-
-    $sql = "DELETE FROM categories WHERE id=?;";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-}
-
-function getAllCategories() {
-    global $connection;
-
-    $sql = "SELECT * FROM categories";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<li><a>No available categories</a></li>';
-        return;
-    }
-    
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '<li><a href="?category=' . $row["name"] . '">' . $row["name"] . '</a></li>';
-    }
-}
-
-function getAllCategoriesForAdmin() {
-    global $connection;
-
-    $sql = "SELECT * FROM categories";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '
-        <div class="no-categories">
-            <p>There are no categories available.</p>
-        </div>
-        ';
-        return;
-    }
-    
-    echo '
-    <div class="categories">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Products</th>
-                <th></th>
-                <th></th>
-            </tr>
-    ';
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '
-            <tr>
-                <td>' . $row["id"] . '</td>
-                <td>' . $row["name"] . '</td>
-                <td>' . getTotalProductsPerCategory($row["id"]) . '</td>
-                <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=edit&category=' . $row["id"] . '" method="post">
-                        <button style="margin-right:20px" class="edit" name="edit">Edit</button>
-                    </form>
-                </td>
-                <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=delete&category=' . $row["id"] . '" method="post">
-                        <button class="delete" name="delete">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        ';
-    }
-    echo '
-        </table>
-    </div>
-    ';
-}
-
-function getCategoryId($name) {
-    global $connection;
-
-    $sql = "SELECT * FROM categories WHERE name=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("s", $name);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    return $row["id"];
-}
-
-function getCategoryName($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM categories WHERE id=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    $row = $resultSet->fetch_assoc();
-
-    return $row["name"];
-}
-
-function doesCategoryExistByName($name) {
-    global $connection;
-
-    $sql = "SELECT * FROM categories WHERE name=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("s", $name);
-    $statement->execute();
-
     $resultSet = $statement->get_result();
 
-    if (mysqli_num_rows($resultSet) == null) {
-        return false;
-    }
-
-    return true;
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["cart"];
 }
 
-function doesCategoryExistById($id) {
-    global $connection;
+function getCartTotal($connection, $userId) {
+    $cart = getAllCartProducts($connection, $userId);
+    $products = explode(",", $cart);
+    $cartPrice = 0;
 
-    $sql = "SELECT * FROM categories WHERE id=?";
+    foreach ($products as $product) {
+        $cartPrice += getProductPrice($connection, $product);
+    }
+
+    return $cartPrice;
+}
+
+function addProductToCart($connection, $userId, $productId) {
+    $newCart = $productId;
+    if ((getAllCartProducts($connection, $userId))) {
+        $currentCart = trim(getAllCartProducts($connection, $userId), ",");
+        
+        $cartProducts = explode(",", $currentCart);
+        $cartProducts[] = $productId;
+
+        $newCart = implode(",", $cartProducts);
+    }
+
+    $sql = "UPDATE users SET cart=? WHERE id=?;";
     $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
+    $statement->bind_param("si", $newCart, $userId);
     $statement->execute();
-
-    $resultSet = $statement->get_result();
-
-    if (mysqli_num_rows($resultSet) == null) {
-        return false;
-    }
-
-    return true;
 }
 
-function getCategoryList() {
-    global $connection;
+function removeProductFromCart($connection, $userId, $productId) {
+    $currentCart = trim(getAllCartProducts($connection, $userId), ",");
+    $cartProducts = explode(",", $currentCart);
 
-    $sql = "SELECT * FROM categories";
-    $resultSet = $connection->query($sql);
+    $productIndex = array_search($productId, $cartProducts);
+    unset($cartProducts[$productIndex]);
 
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p style="margin-bottom:50px">No available categories, please create one first</p>';
-        return;
-    }
-    
-    echo '<select name="category" id="category">';
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '<option value="' . $row["id"] . '">' . $row["name"] . '</option>';
-    }
-    echo '</select>';
-}
+    $newCart = implode(",", $cartProducts);	
 
-
-// Platform data
-function getPlatformName($id) {
-    global $connection;
-    $sql = "SELECT * FROM platforms WHERE id=?";
+    $sql = "UPDATE users SET cart=? WHERE id=?;";
     $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-    
-    $statement->bind_param("i", $id);
+    $statement->bind_param("si", $newCart, $userId);
     $statement->execute();
-
-    $resultSet = $statement->get_result();
-
-    if (mysqli_num_rows($resultSet) == null) {
-        return "Unknown platform";
-    }
-
-    $row = $resultSet->fetch_assoc();
-    
-    return $row["name"];
 }
 
-function getPlatformId($name) {
-    global $connection;
-    $sql = "SELECT * FROM platforms WHERE name=?";
+function emptyCart($connection, $userId) {
+    $sql = "UPDATE users SET cart='' WHERE id=?;";
+
     $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-    
-    $statement->bind_param("s", $name);
+    $statement->bind_param("i", $userId);
     $statement->execute();
-
-    $resultSet = $statement->get_result();
-
-    if (mysqli_num_rows($resultSet) == null) {
-        return "Unknown platform";
-    }
-
-    $row = $resultSet->fetch_assoc();
-    
-    return $row["id"];
 }
-
-function getPlatformList() {
-    global $connection;
-
-    $sql = "SELECT * FROM platforms";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p style="margin-bottom:50px">No available platforms, please create one first</p>';
-        return;
-    }
-    
-    echo '<select style="text-transform:uppercase" name="platform" id="platform">';
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '<option value="' . $row["id"] . '">' . strtoupper($row["name"]) . '</option>';
-    }
-    echo '</select>';
-}
-
 
 // Product data
-function createProduct($category, $name, $platform, $price, $image) {
-    global $connection;
-
-    $sql = "INSERT INTO products (category, name, platform, price, image) VALUES (?, ?, ?, ?, ?)";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("isiis", $category, $name, $platform, $price, $image);
-    $statement->execute();
-}
-
-function updateProduct($id, $category, $name, $platform, $price, $image) {
-    global $connection;
-
-    $sql = "UPDATE products SET category=?, name=?, platform=?, price=?, image=? WHERE id=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("isiisi", $category, $name, $platform, $price, $image, $id);
-    $statement->execute();
-}
-
-function deleteProduct($id) {
-    global $connection;
-
-    $sql = "DELETE FROM products WHERE id=?";
-    $statement = $connection->prepare($sql);
-
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-}
-
-function getAllProducts() {
-    global $connection;
-
-    $sql = "SELECT * FROM products";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '
-        <div class="no-products">
-            <p>There are no products available.</p>
-        </div>
-        ';
-        return;
-    }
-    
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '
-            <div class="product">
-                <div class="product-top">
-                    <img src="' . $row["image"] . '">
-                    <p>' . $row["name"] . '</p>
-                    <p class="platform">' . getPlatformName($row["platform"]) . '</p>
-                </div>
-                <div class="product-bottom">
-                    <p class="price">€' . $row["price"] . '</p>
-                    <form action="./index.php" method="post">
-                        <input type="hidden" name="id" value="' . $row["id"] . '">
-                        <button name="add-item">Buy</button>
-                    </form>
-                </div>
-            </div>
-        ';
-    }
-}
-
-function getProductsByCategory($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM products WHERE category=?";
-    $statement = $connection->prepare($sql);
-    
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '
-        <div class="no-products">
-            <p>There are no products available in this category.</p>
-        </div>
-        ';
-        return;
-    }
-
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '
-            <div class="product">
-                <div class="product-top">
-                    <img src="' . $row["image"] . '">
-                    <p>' . $row["name"] . '</p>
-                    <p class="platform">' . getPlatformName($row["platform"]) . '</p>
-                </div>
-                <div class="product-bottom">
-                    <p class="price">€' . $row["price"] . '</p>
-                    <form action="./index.php" method="post">
-                        <input type="hidden" name="id" value="' . $row["id"] . '">
-                        <button name="add-item">Buy</button>
-                    </form>
-                </div>
-            </div>
-        ';
-    }
-}
-
-function getAllProductsForAdmin() {
-    global $connection;
-
-    $sql = "SELECT * FROM products";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '
-        <div class="no-products">
-            <p>There are no products available.</p>
-        </div>
-        ';
-        return;
-    }
-    
-    echo '
-    <div class="products">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Category</th>
-                <th>Platform</th>
-                <th></th>
-                <th></th>
-            </tr>
-    ';
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '
-            <tr>
-                <td>
-                    <div class="product">
-                        <p>' . $row["id"] . '</p>
-                        <img src="' . $row["image"] . '">
-                    </div>
-                </td>
-                <td>' . $row["name"] . '</td>
-                <td>€' . $row["price"] . '</td>
-                <td>' . getCategoryName($row["category"]) . '</td>
-                <td style="text-transform:uppercase">' . getPlatformName($row["platform"]) . '</td>
-                <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=edit&product=' . $row["id"] . '" method="post">
-                        <button style="margin-right:20px" class="edit" name="edit">Edit</button>
-                    </form>
-                </td>
-                <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=delete&product=' . $row["id"] . '" method="post">
-                        <button class="delete" name="delete">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        ';
-    }
-    echo '
-        </table>
-    </div>
-    ';
-}
-
 function getMostPopularProducts() {
     global $connection;
 
-    $sql = "SELECT products.id, products.price, products.image, products.name,
-            COUNT(FIND_IN_SET(products.id, orders.products)) AS order_count,
-            SUM(products.price) AS total_revenue
-            FROM orders
-            INNER JOIN products
-            ON FIND_IN_SET(products.id, orders.products)
-            WHERE orders.date_added >= DATE_SUB(NOW(), INTERVAL 1 DAY)
-            GROUP BY products.id
-            ORDER BY order_count DESC";
-
+    $sql = "SELECT products FROM orders WHERE date_added >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
     $resultSet = $connection->query($sql);
-    if (mysqli_num_rows($resultSet) == null) {
+
+    $product_counts = array();
+    while ($row = $resultSet->fetch_assoc()) {
+        $product_ids = explode(',', $row['products']);
+        foreach ($product_ids as $product_id) {
+            if (isset($product_counts[$product_id])) {
+                $product_counts[$product_id] += 1;
+            } else {
+                $product_counts[$product_id] = 1;
+            }
+        }
+    }
+
+    if (empty($product_counts)) {
         echo '<p>No popular products :(</p>';
         return;
     }
+
+    // Get the most popular products by sorting the array in descending order of count.
+    arsort($product_counts);
 
     echo '
     <div class="most-popular-products">
@@ -798,21 +479,32 @@ function getMostPopularProducts() {
             <th>Revenue</th>
         </tr>
     ';
-    while ($row = $resultSet->fetch_assoc()) {
-        echo '
-        <tr>
-            <td>
-                <div class="product">
-                    <img src="' . $row["image"] . '">
-                    <p>' . $row["name"] . '</p>
-                </div>
-            </td>
-            <td>' . $row["order_count"] . '</td>
-            <td>€' . $row["price"] . '</td>
-            <td>€' . $row["total_revenue"] . '</td>
-        </tr>
-        ';
+
+    // Loop through the product counts and display the product details.
+    foreach ($product_counts as $product_id => $count) {
+        $product_sql = "SELECT price, image, name FROM products WHERE id = $product_id";
+        $product_result = $connection->query($product_sql);
+
+        if ($product_result->num_rows > 0) {
+            $product_row = $product_result->fetch_assoc();
+            $total_revenue = $count * $product_row['price'];
+
+            echo '
+            <tr>
+                <td>
+                    <div class="product">
+                        <img src="' . $product_row["image"] . '">
+                        <p>' . $product_row["name"] . '</p>
+                    </div>
+                </td>
+                <td>' . $count . '</td>
+                <td>€' . $product_row["price"] . '</td>
+                <td>€' . $total_revenue . '</td>
+            </tr>
+            ';
+        }
     }
+
     echo '
         </table>
     </div>
@@ -842,95 +534,6 @@ function getTotalProductsPerCategory($category) {
     return $row['totalProducts'];
 }
 
-function getProductName($id) {
-    global $connection;
-
-    $sql = "SELECT name FROM products WHERE id=?";
-    $statement = $connection->prepare($sql);
-    
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p>No products in this category - name</p>';
-        return;
-    }
-
-    $row = $resultSet->fetch_assoc();
-    return $row['name'];
-}
-
-function doesProductExistById($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM products WHERE id=?";
-    $statement = $connection->prepare($sql);
-    
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    if (mysqli_num_rows($resultSet) == null) {
-        return false;
-    }
-
-    return true;
-}
-
-function getProductImage($id) {
-    global $connection;
-
-    $sql = "SELECT image FROM products WHERE id=?";
-    $statement = $connection->prepare($sql);
-    
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p>Not a valid product - image</p>';
-        return;
-    }
-
-    $row = $resultSet->fetch_assoc();
-    return $row['image'];
-}
-
-function getProductPrice($id) {
-    global $connection;
-
-    $sql = "SELECT price FROM products WHERE id=?";
-    $statement = $connection->prepare($sql);
-    
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p>Not a valid product - price</p>';
-        return;
-    }
-
-    $row = $resultSet->fetch_assoc();
-    return $row['price'];
-}
 
 // Order data
 function getTotalOrderOfLastDay() {
@@ -971,7 +574,7 @@ function totalRevenueOfLastDay() {
         echo '<p>No revenue</p>';
         return;
     }
-
+    
     echo '<p>€' . $totalRevenue . '</p>';
 }
 
@@ -1005,7 +608,7 @@ function getLatestPaymentsDone() {
                     <p class="date">' . $row["formatted_date"] . '</p>
                 </div>
             </div>
-            <p>€' . $row["total_price"] . '</p>
+            <p>€' . getTotalPriceOfOrder($row["id"]) . '</p>
             <div class="status green">
                 <p>Done</p>
             </div>
@@ -1042,7 +645,7 @@ function getLatestPaymentsPending() {
                     <p class="date">' . $row["formatted_date"] . '</p>
                 </div>
             </div>
-            <p>€' . $row["price"] . '</p>
+            <p>€' . getTotalPriceOfOrder($row["id"]) . '</p>
             <div class="status orange">
                 <p>Pending</p>
             </div>
@@ -1051,181 +654,62 @@ function getLatestPaymentsPending() {
     }
 }
 
-// get all orders of a user with status 0
-function getPendingOrdersOfUser($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM orders WHERE user=? AND status=0";
-    $statement = $connection->prepare($sql);
-    
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p class="no-orders">You have no orders</p>';
-        return;
-    }
-
-    echo '
-    <div class="orders">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Products</th>
-                <th>Purchased</th>
-                <th>Price</th>
-            </tr>
-    ';
-    while ($row = $resultSet->fetch_assoc()) {
-        ?>
-        <tr>
-            <td><?php echo $row["id"] ?></td>
-            <td>
-                <div class="product">
-                    <img src="<?php echo getProductImage($row["products"]) ?>">
-                    <p><?php echo printProductNamesFromOrders($row["id"]) ?></p>
-                </div>
-            </td>
-            <td><?php echo $row["date_added"] ?></td>
-            <td>€<?php echo getTotalPriceOfOrder($row["id"]) ?></td>
-        </tr>
-        <?php
-    }
-    echo '
-        </table>
-    </div>
-    ';
-}
-
-// get all orders of a user with status 1
-function getDoneOrdersOfUser($id) {
-    global $connection;
-
-    $sql = "SELECT * FROM orders WHERE user=? AND status=1";
-    $statement = $connection->prepare($sql);
-    
-    if (!$statement) {
-        die("Error: " . $connection->error);
-    }
-
-    $statement->bind_param("i", $id);
-    $statement->execute();
-
-    $resultSet = $statement->get_result();
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p class="no-orders">You have no orders</p>';
-        return;
-    }
-
-    echo '
-    <div class="orders">
-        <table>
-            <tr>
-                <th>Products</th>
-                <th>Purchased</th>
-                <th>Price</th>
-                <th>Invoice</th>
-            </tr>
-    ';
-    while ($row = $resultSet->fetch_assoc()) {
-        ?>
-        <tr>
-            <td>
-                <div class="product">
-                    <img src="<?php echo getProductImage($row["products"]) ?>">
-                    <p><?php echo printProductNamesFromOrders($row["id"]) ?></p>
-                </div>
-            </td>
-            <td><?php echo $row["date_added"] ?></td>
-            <td>€<?php echo getTotalPriceOfOrder($row["id"]) ?></td>
-            <td>
-                <form action="orders.php" method="post">
-                    <input type="hidden" name="order-id" value="<?php echo $row["id"] ?>">
-                    <button name="download-invoice">Download Invoice</button>
-                </form>
-            </td>
-        </tr>
-        <?php
-    }
-    echo '
-        </table>
-    </div>
-    ';
-}
-
-
-
 // get price of order by order id - products are seperated by comma in the orders table
-function getTotalPriceOfOrder($id) {
+function getTotalPriceOfOrder($orderId) {
     global $connection;
 
-    $sql = "SELECT products.price
-    FROM orders
-    JOIN products ON FIND_IN_SET(products.id, orders.products)
-    WHERE orders.id = ?";
-
+    $sql = "SELECT products FROM orders WHERE id=?";
     $statement = $connection->prepare($sql);
-    $statement->bind_param("i", $id);
+    $statement->bind_param("s", $orderId);
     $statement->execute();
-
     $resultSet = $statement->get_result();
-    $totalPrice = 0;
-    while ($row = $resultSet->fetch_assoc()) {
-        $totalPrice += $row["price"];
-    }
 
-    return $totalPrice;
+    $row = $resultSet->fetch_assoc();
+    $product_ids = explode(',', $row['products']);
+    $total_price = 0;
+
+    foreach ($product_ids as $product_id) {
+        $product_sql = "SELECT price FROM products WHERE id = $product_id";
+        $product_result = $connection->query($product_sql);
+  
+        if ($product_result->num_rows > 0) {
+          $product_row = $product_result->fetch_assoc();
+          $total_price += $product_row['price'];
+        }
+      }
+  
+    return $total_price;
 }
 
-
-
-function getAllOrdersForAdmin() {
+function getTotalPriceOfLastDayOrders() {
     global $connection;
 
-    $sql = "SELECT * FROM orders";
+    $sql = "SELECT products FROM orders WHERE date_added >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
     $resultSet = $connection->query($sql);
+    $total_price = 0;
 
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p class="no-orders">There are not orders</p>';
+    while ($row = $resultSet->fetch_assoc()) {
+        $product_ids = explode(',', $row['products']);
+
+        foreach ($product_ids as $product_id) {
+            $product_sql = "SELECT price FROM products WHERE id = $product_id";
+            $product_result = $connection->query($product_sql);
+
+            if ($product_result->num_rows > 0) {
+                $product_row = $product_result->fetch_assoc();
+                $total_price += $product_row['price'];
+            }
+        }
+    }
+
+    if (mysqli_num_rows($resultSet) == 0) {
+        echo '<p>No orders</p>';
         return;
     }
 
-    echo '
-    <div class="orders">
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>Products</th>
-                <th></th>
-            </tr>
-    ';
-    while ($row = $resultSet->fetch_assoc()) {
-        ?>
-        <tr>
-            <td><?php echo $row["id"] ?></td>
-            <td><?php echo getUserEmail($row["user"]) ?></td>
-            <td><?php echo printProductNamesFromOrders($row["id"]) ?></td>
-            <td style="text-align:right; width:20%">
-                <form action="orders.php" method="post">
-                    <input type="hidden" name="order-id" value="<?php echo $row["id"] ?>">
-                    <button name="download-invoice">Download Invoice</button>
-                </form>
-            </td>
-        </tr>
-        <?php
-    }
-        
-    echo '
-        </table>
-    </div>
-    ';
+    echo '<p>€' . $total_price . '</p>';
 }
+
 
 function checkIfOrderIdExists($id) {
     global $connection;
@@ -1243,8 +727,11 @@ function checkIfOrderIdExists($id) {
 function getProductIdsFromOrders($id) {
     global $connection;
 
-    $sql = "SELECT products FROM orders";
-    $resultSet = $connection->query($sql);
+    $sql = "SELECT products FROM orders WHERE id=?";
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("s", $id);
+    $statement->execute();
+    $resultSet = $statement->get_result();
 
     $productIds = array();
     while ($row = $resultSet->fetch_assoc()) {
@@ -1263,6 +750,7 @@ function getProductNamesFromOrders($id) {
 
     $sql = "SELECT name FROM products WHERE id IN ($productIdsString)";
     $resultSet = $connection->query($sql);
+
 
     while ($row = $resultSet->fetch_assoc()) {
         array_push($productNames, $row["name"]);
@@ -1306,65 +794,6 @@ function downloadPdf($id) {
 
 
 // Cart data
-function getCartProducts($id) {
-    global $connection;
-
-    $sql = "SELECT cart FROM users WHERE id = $id";
-    $resultSet = $connection->query($sql);
-    
-    if (mysqli_num_rows($resultSet) == null) {
-        echo '<p class="no-products">There are no products in your cart</p>';
-        return;
-    }
-
-    $row = $resultSet->fetch_assoc();
-
-    if (empty($row["cart"])) {
-        echo '<p class="no-products">There are no products in your cart</p>';
-        return;
-    }
-    $products = explode(",", $row["cart"]);
-    $products_count = array_count_values($products);
-
-    echo '
-    <table>
-        <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Amount</th>
-            <th></th>
-            <th></th>
-        </tr>
-    ';
-    foreach ($products_count as $product => $quantity) {
-        echo '
-        <tr>
-            <td class="product">
-                <img src="' . getProductImage($product) . '">
-                <p>' . getProductName($product) . '</p>
-            </td>
-            <td>€' . getProductPrice($product) . '</td>
-            <td>
-                <span class="product-count">' . $quantity . '</span>
-            </td>
-            <td style="text-align:right; width:1%">
-                <form action="./cart.php" method="post">
-                    <input type="hidden" name="product_id" value="' . $product . '">
-                    <button style="margin-right:20px" name="add-product" value="' . $product . '">+</button>
-                </form>
-            </td>
-            <td style="text-align:right; width:1%">
-                <form action="./cart.php" method="post">
-                    <input type="hidden" name="product_id" value="' . $product . '">
-                    <button name="remove-product" value="' . $product . '">-</button>
-                </form>
-            </td>
-        </tr>
-        ';
-    }
-    echo '</table>';
-}
-
 function getCartProductsInfo($id) {
     global $connection;
 
@@ -1388,9 +817,9 @@ function getCartProductsInfo($id) {
     foreach ($products_count as $product => $quantity) {
         $product_info = array(
             "id" => $product,
-            "name" => getProductName($product),
-            "image" => getProductImage($product),
-            "price" => getProductPrice($product),
+            "name" => getProductName($connection, $product),
+            "image" => getProductImage($connection, $product),
+            "price" => getProductPrice($connection, $product),
             "quantity" => $quantity
         );
 
@@ -1398,93 +827,6 @@ function getCartProductsInfo($id) {
     }
 
     return $products_info;
-}
-
-function removeProductFromCart($userId, $productId) {
-    global $connection;
-
-    $sql = "SELECT cart FROM users WHERE id = $userId";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        return;
-    }
-
-    $row = $resultSet->fetch_assoc();
-    $cart = $row["cart"];
-
-    $cart = trim($cart, ',');
-
-    $products = explode(",", $cart);
-
-    $index = array_search($productId, $products);
-
-    if ($index !== false) {
-        unset($products[$index]);
-
-        $updatedCart = implode(",", $products);
-
-        $sql = "UPDATE users SET cart = '$updatedCart' WHERE id = $userId";
-        $connection->query($sql);
-    }
-}
-
-function addProductToCart($userId, $productId) {
-    global $connection;
-
-    $sql = "SELECT cart FROM users WHERE id = $userId";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        return;
-    }
-
-    $row = $resultSet->fetch_assoc();
-    $cart = $row["cart"];
-
-    if (empty($cart)) {
-        $updatedCart = $productId;
-    } else {
-        $cart = trim($cart, ',');
-
-        $products = explode(",", $cart);
-        $products[] = $productId;
-        
-        $updatedCart = implode(",", $products);
-    }
-
-    $sql = "UPDATE users SET cart = '$updatedCart' WHERE id = $userId";
-    $connection->query($sql);
-}
-
-function getCartTotal($id) {
-    global $connection;
-
-    $sql = "SELECT cart FROM users WHERE id = $id";
-    $resultSet = $connection->query($sql);
-
-    if (mysqli_num_rows($resultSet) == null) {
-        return;
-    }
-
-    $row = $resultSet->fetch_assoc();
-    $cart = $row["cart"];
-
-    if (empty($cart)) {
-        return 0;
-    }
-
-    $cart = trim($cart, ',');
-
-    $products = explode(",", $cart);
-
-    $total = 0;
-
-    foreach ($products as $product) {
-        $total += getProductPrice($product);
-    }
-
-    return $total;
 }
 
 function getCartTotalProducts($id) {
@@ -1509,13 +851,5 @@ function getCartTotalProducts($id) {
     $products = explode(",", $cart);
 
     return count($products);
-}
-
-// empty order column in users table
-function emptyCart($id) {
-    global $connection;
-
-    $sql = "UPDATE users SET cart = '' WHERE id = $id";
-    $connection->query($sql);
 }
 /* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */

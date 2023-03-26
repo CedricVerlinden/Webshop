@@ -1,5 +1,5 @@
 <?php
-require '../../fpdf/fpdf.php';
+require '../../libraries/fpdf/fpdf.php';
 include 'connect.inc.php';
 
 function createPdfFile($userId, $orderId) {
@@ -62,7 +62,9 @@ function generateInvoicePDF($customerName, $address, $invoiceNumber, $invoiceDat
     $productIds = array();
     $pdf->SetFont('Helvetica','',12);
     foreach ($items as $item) {
-        $productIds[] = $item['id'];
+        for ($i = 0; $i < $item['quantity']; $i++) {
+            $productIds[] = $item['id'];
+        }
         $pdf->Cell(90, 10, $item['name'], 1,0);
         $pdf->Cell(30, 10, EURO . ' ' . $item['price'], 1,0);
         $pdf->Cell(30, 10, $item['quantity'], 1,0);

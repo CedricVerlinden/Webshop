@@ -2,9 +2,12 @@
 session_start();
 include '../includes/data.inc.php';
 
+
 if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
-    addProductToCart($_SESSION["userid"], $_POST["id"]);
+    addProductToCart($connection, $_SESSION["userid"], $_POST["id"]);
 }
+
+// var_dump(getCartProductsInfo($_SESSION["userid"])[0]["quantity"]);
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +16,6 @@ if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/0489e35579.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../assets/css/index.css">
     <link rel="stylesheet" href="../assets/css/buttons.css">
     <link rel="stylesheet" href="../assets/css/header.css">
@@ -28,7 +30,7 @@ if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
             </div>
             <div class="categories">
                 <ul class="category-list">
-                    <?php getAllCategories(); ?>
+                    <?php displayCategories($connection); ?>
                 </ul>
             </div>
             <div class="navigation-right">
@@ -77,9 +79,9 @@ if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
         <div class="products">
             <?php
             if (isset($_GET["category"])) {
-                getProductsByCategory(getCategoryId($_GET["category"]));
+                displayProductsByCategory($connection, getCategoryId($connection, $_GET["category"]));
             } else {
-                getAllProducts();
+                displayProducts($connection);
             }
             ?>
         </div>
@@ -131,4 +133,69 @@ if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
     </div>
 </body>
 </html>
+
+<?php
+function displayCategories($connection) {
+    if (!(getAllCategories($connection))) {
+        noData("categories");
+        return;
+    }
+
+    foreach (getAllCategories($connection) as $row) {
+        echo '<li><a href="?category=' . $row["name"] . '">' . $row["name"] . '</a></li>';
+    }
+}
+
+function displayProductsByCategory($connection, $category) {
+    if (!(getAllProductsByCategory($connection, $category))) {
+        noData("products");
+        return;
+    }
+
+    foreach(getAllProducts($connection, $category) as $row) {
+        echo '
+            <div class="product">
+                <div class="product-top">
+                    <img src="' . $row["image"] . '">
+                    <p>' . $row["name"] . '</p>
+                    <p class="platform">' . getPlatformName($connection, $row["platform"]) . '</p>
+                </div>
+                <div class="product-bottom">
+                    <p class="price">€' . $row["price"] . '</p>
+                    <form action="./index.php" method="post">
+                        <input type="hidden" name="id" value="' . $row["id"] . '">
+                        <button name="add-item">Buy</button>
+                    </form>
+                </div>
+            </div>
+        ';
+    }
+}
+
+function displayProducts($connection) {
+    if (!(getAllProducts($connection))) {
+        noData("products");
+        return;
+    }
+
+    foreach(getAllProducts($connection) as $row) {
+        echo '
+            <div class="product">
+                <div class="product-top">
+                    <img src="' . $row["image"] . '">
+                    <p>' . $row["name"] . '</p>
+                    <p class="platform">' . getPlatformName($connection, $row["platform"]) . '</p>
+                </div>
+                <div class="product-bottom">
+                    <p class="price">€' . $row["price"] . '</p>
+                    <form action="./index.php" method="post">
+                        <input type="hidden" name="id" value="' . $row["id"] . '">
+                        <button name="add-item">Buy</button>
+                    </form>
+                </div>
+            </div>
+        ';
+    }
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

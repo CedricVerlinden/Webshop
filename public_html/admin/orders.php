@@ -86,7 +86,7 @@ if (isset($_POST["order-id"])) {
         <div class="content">
             <div class="orders-wrapper">
                 <h1>Orders</h1>
-                <?php getAllOrdersForAdmin(); ?>
+                <?php displayOrders($connection); ?>
             </div>
         </div>
         
@@ -137,4 +137,42 @@ if (isset($_POST["order-id"])) {
     </div>
 </body>
 </html>
+<?php
+function displayOrders($connection) {
+    if (!(getAllOrders($connection))) {
+        noData("orders");
+        return;
+    }
+
+    echo '
+    <div class="orders">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Products</th>
+                <th></th>
+            </tr>
+    ';
+    foreach (getAllOrders($connection) as $row) {
+        ?>
+        <tr>
+            <td><?php echo $row["id"] ?></td>
+            <td><?php echo getUserEmail($connection, $row["user"]) ?></td>
+            <td><?php echo printProductNamesFromOrders($row["id"]) ?></td>
+            <td style="text-align:right; width:20%">
+                <form action="orders.php" method="post">
+                    <input type="hidden" name="order-id" value="<?php echo $row["id"] ?>">
+                    <button name="download-invoice">Download Invoice</button>
+                </form>
+            </td>
+        </tr>
+        <?php
+    }
+    echo '
+        </table>
+    </div>
+    ';
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

@@ -8,6 +8,11 @@ if (!(isset($_SESSION["userid"]) && isset($_POST["checkout"]))) {
     return;
 }
 
+if (getAllCartProducts($connection, $_SESSION["userid"]) == null) {
+    header("Location: ./cart.php");
+    return;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +21,6 @@ if (!(isset($_SESSION["userid"]) && isset($_POST["checkout"]))) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/0489e35579.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../../assets/css/account/checkout.css">
     <link rel="stylesheet" href="../../assets/css/header.css">
     <link rel="stylesheet" href="../../assets/css/footer.css">
@@ -80,14 +84,14 @@ if (!(isset($_SESSION["userid"]) && isset($_POST["checkout"]))) {
 
         <div class="content">
             <?php 
-            $address = getUserStreet($_SESSION["userid"]) . " " . getUserNumber($_SESSION["userid"]) . ", " . getUserState($_SESSION["userid"]) . ", " . getUserCountry($_SESSION["userid"]);
+            $address = getUserStreet($connection, $_SESSION["userid"]) . " " . getUserHouseNumber($connection, $_SESSION["userid"]) . ", " . getUserState($connection, $_SESSION["userid"]) . ", " . getUserCountry($connection, $_SESSION["userid"]);
             $random = rand(1000, 9999);
             while (checkIfOrderIdExists($random)) {
                 $random = rand(1000, 9999);
             }
 
-            generateInvoicePDF(getUserEmail($_SESSION["userid"]), $address, "ORD-" . $random,  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["btw"], $_POST["total"]);
-            emptyCart($_SESSION["userid"]); ?>
+            generateInvoicePDF(getUserEmail($connection, $_SESSION["userid"]), $address, "ORD-" . $random,  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["btw"], $_POST["total"]);
+            emptyCart($connection, $_SESSION["userid"]); ?>
         </div>
 
         <footer>

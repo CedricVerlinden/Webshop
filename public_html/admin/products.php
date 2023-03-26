@@ -87,7 +87,7 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
                         <button class="new-product" name="new-product">New Product</button>
                     </form>
                 </div>
-                <?php getAllProductsForAdmin(); ?>
+                <?php displayProducts($connection); ?>
             </div>
         </div>
         
@@ -138,4 +138,56 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
     </div>
 </body>
 </html>
+<?php
+function displayProducts($connection) {
+    if (!(getAllProducts($connection))) {
+        noData("products");
+        return;
+    }
+
+    echo '
+    <div class="products">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Platform</th>
+                <th></th>
+                <th></th>
+            </tr>
+    ';
+    foreach(getAllProducts($connection) as $row) {
+        echo '
+            <tr>
+                <td>
+                    <div class="product">
+                        <p>' . $row["id"] . '</p>
+                        <img src="' . $row["image"] . '">
+                    </div>
+                </td>
+                <td>' . $row["name"] . '</td>
+                <td>€' . $row["price"] . '</td>
+                <td>' . getCategoryName($connection, $row["category"]) . '</td>
+                <td style="text-transform:uppercase">' . getPlatformName($connection, $row["platform"]) . '</td>
+                <td style="text-align:right; width:1%">
+                    <form action="./edit.php?type=edit&product=' . $row["id"] . '" method="post">
+                        <button style="margin-right:20px" class="edit" name="edit">Edit</button>
+                    </form>
+                </td>
+                <td style="text-align:right; width:1%">
+                    <form action="./edit.php?type=delete&product=' . $row["id"] . '" method="post">
+                        <button class="delete" name="delete">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        ';
+    }
+    echo '
+        </table>
+    </div>
+    ';
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

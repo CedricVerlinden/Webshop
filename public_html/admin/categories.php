@@ -87,7 +87,7 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
                         <button class="new-category" name="new-category">New Category</button>
                     </form>
                 </div>
-                <?php getAllCategoriesForAdmin(); ?>
+                <?php displayCategories($connection); ?>
             </div>
         </div>
         
@@ -138,4 +138,47 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
     </div>
 </body>
 </html>
+<?php
+function displayCategories($connection) {
+    if (!(getAllCategories($connection))) {
+        noData("categories");
+        return;
+    }
+
+    echo '
+    <div class="categories">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Products</th>
+                <th></th>
+                <th></th>
+            </tr>
+    ';
+    foreach (getAllCategories($connection) as $row) {
+        echo '
+            <tr>
+                <td>' . $row["id"] . '</td>
+                <td>' . $row["name"] . '</td>
+                <td>' . getTotalProductsPerCategory($row["id"]) . '</td>
+                <td style="text-align:right; width:1%">
+                    <form action="./edit.php?type=edit&category=' . $row["id"] . '" method="post">
+                        <button style="margin-right:20px" class="edit" name="edit">Edit</button>
+                    </form>
+                </td>
+                <td style="text-align:right; width:1%">
+                    <form action="./edit.php?type=delete&category=' . $row["id"] . '" method="post">
+                        <button class="delete" name="delete">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        ';
+    }
+    echo '
+        </table>
+    </div>
+    ';
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

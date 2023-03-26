@@ -84,13 +84,13 @@ if (isset($_POST["download-invoice"])) {
             <div class="pending-orders-wrapper">
                 <h1>Pending Orders</h1>
                 <div class="pending-orders">
-                    <?php getPendingOrdersOfUser($_SESSION["userid"]) ?>
+                    <?php displayOrders($connection, $_SESSION["userid"], 0) ?>
                 </div>
             </div>
             <div class="order-history-wrapper">
                 <h1>Order History</h1>
                 <div class="order-history">
-                    <?php getDoneOrdersOfUser($_SESSION["userid"]) ?>
+                    <?php displayOrders($connection, $_SESSION["userid"], 1) ?>
                 </div>
             </div>
         </div>
@@ -142,4 +142,44 @@ if (isset($_POST["download-invoice"])) {
     </div>
 </body>
 </html>
+<?php
+function displayOrders($connection, $userId, $status) {
+    if (!(getUserOrdersByStatus($connection, $userId, $status))) {
+        echo noData("orders");
+        return;
+    }
+
+    echo '
+    <div class="orders">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Products</th>
+                <th>Purchased</th>
+                <th>Price</th>
+            </tr>
+    ';
+    $index = 1;
+    foreach (getUserOrdersByStatus($connection, $userId, $status) as $row) {
+        ?>
+        <tr>
+            <td><?php echo $row["id"] ?></td>
+            <td>
+                <div class="product">
+                    <img src="<?php echo getProductImage($connection, $row["products"]) ?>">
+                    <p><?php echo printProductNamesFromOrders($row["id"]) ?></p>
+                </div>
+            </td>
+            <td><?php echo $row["date_added"] ?></td>
+            <td>€<?php echo getTotalPriceOfOrder($row["id"]) ?></td>
+        </tr>
+        <?php
+        $index++;
+    }
+    echo '
+        </table>
+    </div>
+    ';
+}
+?>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->
