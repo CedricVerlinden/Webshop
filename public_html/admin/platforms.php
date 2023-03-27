@@ -14,12 +14,11 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://kit.fontawesome.com/0489e35579.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../../assets/css/admin/categories.css">
     <link rel="stylesheet" href="../../assets/css/header.css">
     <link rel="stylesheet" href="../../assets/css/footer.css">
     <link rel="stylesheet" href="../../assets/css/buttons.css">
-    <title>Categories - Store</title>
+    <title>Platforms - Store</title>
 </head>
 <body>
     <div class="container">
@@ -83,12 +82,12 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
         <div class="content">
             <div class="categories-wrapper">
                 <div class="top">
-                    <h1>Categories</h1>
-                    <form action="./edit.php?type=create&category=new" method="post">
-                        <button class="new-category" name="new-category">New Category</button>
+                    <h1>Platforms</h1>
+                    <form action="./edit.php?type=create&platform=new" method="post">
+                        <button class="new-platform" name="new-platform">New Platform</button>
                     </form>
                 </div>
-                <?php displayCategories($connection); ?>
+                <?php displayPlatforms($connection); ?>
             </div>
         </div>
         
@@ -140,9 +139,9 @@ if (!(isset($_SESSION["admin"]) && $_SESSION["admin"] == 1)) {
 </body>
 </html>
 <?php
-function displayCategories($connection) {
-    if (!(getAllCategories($connection))) {
-        noData("categories");
+function displayPlatforms($connection) {
+    if (!(getAllPlatforms($connection))) {
+        noData("platforms");
         return;
     }
 
@@ -152,24 +151,22 @@ function displayCategories($connection) {
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Products</th>
                 <th></th>
                 <th></th>
             </tr>
     ';
-    foreach (getAllCategories($connection) as $row) {
+    foreach (getAllPlatforms($connection) as $row) {
         echo '
             <tr>
                 <td>' . $row["id"] . '</td>
                 <td>' . $row["name"] . '</td>
-                <td>' . getTotalProductsPerCategory($row["id"]) . '</td>
                 <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=edit&category=' . $row["id"] . '" method="post">
+                    <form action="./edit.php?type=edit&platform=' . $row["id"] . '" method="post">
                         <button style="margin-right:20px" class="edit" name="edit">Edit</button>
                     </form>
                 </td>
                 <td style="text-align:right; width:1%">
-                    <form action="./edit.php?type=delete&category=' . $row["id"] . '" method="post">
+                    <form action="./edit.php?type=delete&platform=' . $row["id"] . '" method="post">
                         <button class="delete" name="delete">Delete</button>
                     </form>
                 </td>

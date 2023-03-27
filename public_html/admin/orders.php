@@ -36,6 +36,7 @@ if (isset($_POST["order-id"])) {
                     <li><a href="./">Dashboard</a></li>
                     <li><a href="./products.php">Products</a></li>
                     <li><a href="./categories.php">Categories</a></li>
+                    <li><a href="./platforms.php">Platforms</a></li>
                     <li><a href="./orders.php">Orders</a></li>
                     <li><a href="./customers.php">Customers</a></li>
                 </ul>

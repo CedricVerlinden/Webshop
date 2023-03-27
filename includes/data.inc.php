@@ -107,7 +107,7 @@ function createCategory($connection, $categoryName) {
 function updateCategory($connection, $categoryId, $categoryName) {
     $sql = "UPDATE categories SET name=? WHERE id=?;";
     
-    if (!(getCategoryName($connection, $categoryName))) {
+    if (doesCategoryExist($connection, $categoryName)) {
         return false;
     }
 
@@ -186,6 +186,63 @@ function getPlatformName($connection, $platformId) {
     return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["name"];
 }
 
+function getPlatformId($connection, $platformName) {
+    $sql = "SELECT * FROM platforms WHERE name=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $platformName);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows == 0) ? false : $resultSet->fetch_assoc()["id"];
+}
+
+function doesPlatformExist($connection, $platformName) {
+    $sql = "SELECT * FROM platforms WHERE name=?;";
+    
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("s", $platformName);
+    $statement->execute();
+    $resultSet = $statement->get_result();
+
+    return ($resultSet->num_rows != 0);
+}
+
+function createPlatform($connection, $platformName) {
+    $sql = "INSERT INTO platforms (name) VALUES (?);";
+    
+    if (doesPlatformExist($connection, $platformName)) {
+        return false;
+    }
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("s", $platformName);
+    $statement->execute();
+    return true;
+}
+
+function updatePlatform($connection, $platformId, $platformName) {
+    $sql = "UPDATE platforms SET name=? WHERE id=?;";
+    
+    if (!(getPlatformName($connection, $platformId))) {
+        return false;
+    }
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("si", $platformName, $platformId);
+    $statement->execute();
+    return true;
+}
+
+function deletePlatform($connection, $platformId) {
+    $sql = "DELETE FROM platforms WHERE id=?;";
+
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $platformId);
+    $statement->execute();
+    return true;
+}
+
 
 // Products data
 function getAllProducts($connection) {
@@ -258,11 +315,11 @@ function createProduct($connection, $categoryId, $productName, $productPlatform,
     $statement->execute();
 }
 
-function updateProduct($connection, $categoryId, $productName, $productPlatform, $productPrice, $productImage) {
-    $sql = "UPDATE products SET category=?, name=?, platform=?, price=?, image=?;";
+function updateProduct($connection, $productId, $categoryId, $productName, $productPlatform, $productPrice, $productImage) {
+    $sql = "UPDATE products SET category=?, name=?, platform=?, price=?, image=? WHERE id=?;";
 
     $statement = $connection->prepare($sql);
-    $statement->bind_param("isiis", $categoryId, $productName, $productPlatform, $productPrice, $productImage);
+    $statement->bind_param("isiisi", $categoryId, $productName, $productPlatform, $productPrice, $productImage, $productId);
     $statement->execute();
 }
 
