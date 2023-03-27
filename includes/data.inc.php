@@ -832,14 +832,17 @@ function getCartProductsInfo($id) {
 function getCartTotalProducts($id) {
     global $connection;
 
-    $sql = "SELECT cart FROM users WHERE id = $id";
-    $resultSet = $connection->query($sql);
+    $sql = "SELECT cart FROM users WHERE id=?;";
+    $statement = $connection->prepare($sql);
+    $statement->bind_param("i", $id);
+    $statement->execute();
+    $resultSet = $statement->get_result();
 
-    if (mysqli_num_rows($resultSet) == null) {
+    $row = $resultSet->fetch_assoc();
+    if ($resultSet->num_rows == null || $row["cart"] == null) {
         return 0;
     }
 
-    $row = $resultSet->fetch_assoc();
     $cart = $row["cart"];
 
     $cart = trim($cart, ',');

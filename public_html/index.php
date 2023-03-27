@@ -152,7 +152,7 @@ function displayProductsByCategory($connection, $category) {
         return;
     }
 
-    foreach(getAllProducts($connection, $category) as $row) {
+    foreach(getAllProductsByCategory($connection, $category) as $row) {
         echo '
             <div class="product">
                 <div class="product-top">
