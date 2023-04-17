@@ -3,6 +3,13 @@ session_start();
 include "../../includes/data.inc.php";
 include "../../includes/checkout.inc.php";
 
+if (isset($_POST["paypal"])) {
+    generateInvoicePDF(getUserEmail($connection, $_SESSION["userid"]), $_POST["customerAddress"], $_POST["invoiceNumber"],  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["tax"], $_POST["total"]);
+    emptyCart($connection, $_SESSION["userid"]);
+    echo 201;
+    return;
+}
+
 if (!(isset($_SESSION["userid"]) && isset($_POST["checkout"]))) {
     header("Location: ../index.php");
     return;
@@ -90,8 +97,11 @@ if (getAllCartProducts($connection, $_SESSION["userid"]) == null) {
                 $random = rand(1000, 9999);
             }
 
+            
+
             generateInvoicePDF(getUserEmail($connection, $_SESSION["userid"]), $address, "ORD-" . $random,  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["btw"], $_POST["total"]);
-            emptyCart($connection, $_SESSION["userid"]); ?>
+            emptyCart($connection, $_SESSION["userid"]);
+            echo 201; ?>
         </div>
 
         <footer>

@@ -121,8 +121,13 @@ if (isset($_POST["remove-product"])) {
                             <input type="hidden" name="subtotal" value="<?php echo getCartTotal($connection, $_SESSION["userid"]) ?>">
                             <input type="hidden" name="btw" value="<?php echo $btw ?>">
                             <input type="hidden" name="total" value="<?php echo getCartTotal($connection, $_SESSION["userid"]) + $btw ?>">
-                            <input class="button" type="submit" name="checkout" value="Checkout">
+                            <?php if (!(getAllCartProducts($connection, $_SESSION["userid"]) == null)) {
+                                echo '<input class="button" type="submit" name="checkout" value="Checkout">';
+                            }?>
                         </form>
+                        <?php if (!(getAllCartProducts($connection, $_SESSION["userid"]) == null)) {
+                            echo '<div style="margin-top:50px" id="paypal-button-container"></div>';
+                        }?>
                     </div>
                 </div>
             </div>
@@ -175,6 +180,55 @@ if (isset($_POST["remove-product"])) {
     </div>
 </body>
 </html>
+<?php if (!(getAllCartProducts($connection, $_SESSION["userid"]) == null)) {?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=AQrRas305h9M9WVMLU8T95AxvQV6jTsO5Ywp43qHW1ylJecrpuc5jtIGX5svHeSRryW6sT9zvP5Rlg3w&currency=EUR"></script>
+<script>
+    paypal.Buttons({
+        createOrder: (data, actions) => {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: <?php echo (getCartTotal($connection, $_SESSION["userid"]) + (getCartTotal($connection, $_SESSION["userid"]) * 0.21)) ?>
+                    }
+                }]
+            });
+        },
+
+        onApprove: (data, actions) => {
+            return actions.order.capture().then(function(orderData) {
+                const transaction = orderData.purchase_units[0].payments.captures[0];
+
+                var data = {
+                    'paypal': true,
+                    'customerEmail': '<?php echo getUserEmail($connection, $_SESSION["userid"]) ?>',
+                    'customerAddress': '<?php echo getUserStreet($connection, $_SESSION["userid"]) . ' ' . getUserHouseNumber($connection, $_SESSION["userid"]) . ', ' . getUserState($connection, $_SESSION["userid"]) . ' ' . getUserCountry($connection, $_SESSION["userid"]) ?>',
+                    'invoiceNumber': transaction.id, 
+                    'subtotal': <?php echo getCartTotal($connection, $_SESSION["userid"]) ?>,
+                    'tax': <?php echo getCartTotal($connection, $_SESSION["userid"]) * 0.21 ?>,
+                    'total': <?php echo (getCartTotal($connection, $_SESSION["userid"]) + (getCartTotal($connection, $_SESSION["userid"]) * 0.21)) ?>
+                }
+
+                $.ajax({
+                    method: "POST",
+                    url: "./checkout.php",
+                    data: data,
+                    success: function (response) {
+                        console.log("Request succeeded: " + response);
+                        window.location.href = "./checkout.php";
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("An error occurred: " + error);
+                        console.log("Status: " + status);
+                        console.log("Response: " + xhr.responseText);
+                    }
+                });
+            })
+        }
+    }).render("#paypal-button-container");
+</script>
+<?php } ?> 
+
 <?php
 function displayProducts($connection) {
     if (!(getAllCartProducts($connection, $_SESSION["userid"]))) {

@@ -7,7 +7,6 @@ if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
     addProductToCart($connection, $_SESSION["userid"], $_POST["id"]);
 }
 
-// var_dump(getCartProductsInfo($_SESSION["userid"])[0]["quantity"]);
 ?>
 
 <!DOCTYPE html>
