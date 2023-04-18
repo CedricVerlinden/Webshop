@@ -20,7 +20,7 @@ This is a custom-made webshop designed to meet the needs of both customers and s
 
 1. Clone the repository:
 
-`git clone https://github.com/your-username/custom-webshop.git`
+`git clone https://github.com/cedricverlinden/webshop.git`
 
 2. Import the SQL dump file `database.sql` into your MySQL database.
 
