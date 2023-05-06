@@ -4,26 +4,30 @@ include "../../includes/data.inc.php";
 include "../../includes/checkout.inc.php";
 
 if (isset($_POST["paypal"])) {
-    generateInvoicePDF(getUserEmail($connection, $_SESSION["userid"]), $_POST["customerAddress"], $_POST["invoiceNumber"],  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["tax"], $_POST["total"]);
+    generateInvoicePDF("paypal", getUserEmail($connection, $_SESSION["userid"]), $_POST["customerAddress"], $_POST["invoiceNumber"],  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["tax"], $_POST["total"]);
     emptyCart($connection, $_SESSION["userid"]);
-    echo 201;
     return;
 }
 
 if (!(isset($_SESSION["userid"]) && isset($_POST["checkout"]))) {
-    header("Location: ../index.php");
-    return;
+    if (!(isset($_GET["checkout"]) && isset($_GET["paypal"]))) {
+        header("Location: ../index.php");
+        return;
+    }
 }
 
 if (getAllCartProducts($connection, $_SESSION["userid"]) == null) {
-    header("Location: ./cart.php");
-    return;
+    if (!(isset($_GET["checkout"]) && isset($_GET["paypal"]))) {
+        header("Location: ./cart.php");
+        return;
+    }
 }
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -34,6 +38,7 @@ if (getAllCartProducts($connection, $_SESSION["userid"]) == null) {
     <link rel="stylesheet" href="../../assets/css/buttons.css">
     <title>Cart - Store</title>
 </head>
+
 <body>
     <div class="container">
         <div class="navigation">
@@ -90,18 +95,25 @@ if (getAllCartProducts($connection, $_SESSION["userid"]) == null) {
         </div>
 
         <div class="content">
-            <?php 
+            <?php
+            if (isset($_GET["paypal"])) {
+                echo '
+                <h2>Thank you for your purchase!</h2
+                <p>You will be able to see you order info in your orders section of your account.</p>
+                ';
+                return;
+            }
+
             $address = getUserStreet($connection, $_SESSION["userid"]) . " " . getUserHouseNumber($connection, $_SESSION["userid"]) . ", " . getUserState($connection, $_SESSION["userid"]) . ", " . getUserCountry($connection, $_SESSION["userid"]);
+            
             $random = rand(1000, 9999);
             while (checkIfOrderIdExists($random)) {
                 $random = rand(1000, 9999);
             }
 
-            
-
-            generateInvoicePDF(getUserEmail($connection, $_SESSION["userid"]), $address, "ORD-" . $random,  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["btw"], $_POST["total"]);
+            generateInvoicePDF("normal", getUserEmail($connection, $_SESSION["userid"]), $address, "ORD-" . $random,  date('Y-m-d'), getCartProductsInfo($_SESSION["userid"]), $_POST["subtotal"], $_POST["btw"], $_POST["total"]);
             emptyCart($connection, $_SESSION["userid"]);
-            echo 201; ?>
+            ?>
         </div>
 
         <footer>
@@ -138,7 +150,7 @@ if (getAllCartProducts($connection, $_SESSION["userid"]) == null) {
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
                 <p>© 2023 Cédric Verlinden. All rights reserved.</p>
                 <div class="footer-socials">
@@ -150,5 +162,6 @@ if (getAllCartProducts($connection, $_SESSION["userid"]) == null) {
         </footer>
     </div>
 </body>
+
 </html>
 <!-- Copyright (c) 2023 Cédric Verlinden. All rights reserved. -->

@@ -28,7 +28,7 @@ function createPdfFile($userId, $orderId) {
     echo ' <a href="' . $pdf_file . '">Download PDF</a>';
 }
 
-function generateInvoicePDF($customerName, $address, $invoiceNumber, $invoiceDate, $items, $subtotal, $tax, $total) {
+function generateInvoicePDF($method, $customerName, $address, $invoiceNumber, $invoiceDate, $items, $subtotal, $tax, $total) {
     global $connection;
     
     define('EURO',chr(128));
@@ -90,15 +90,17 @@ function generateInvoicePDF($customerName, $address, $invoiceNumber, $invoiceDat
     $pdf_file = $invoiceNumber . '.pdf';
     $pdf->Output('F', '../../orders/' . $pdf_file);
     
-    // echo '
-    // <div class="card">
-    //     <h2>Order placed</h2>
-    //     <p>Your order has been placed successfully. You can download your invoice <a href="../../orders/' . $pdf_file . '" target="_blank">here</a>.</p>
-    //     <p>Order ID: ORD-' . $invoiceNumber . '</p>
-    //     <p>Order date: ' . $invoiceDate . '</p>
-    //     <p>Order address: ' . $address . '</p>
-    // </div>
-    // ';
+    if (!($method == "paypal")) {
+        echo '
+        <div class="card">
+            <h2>Order placed</h2>
+            <p>Your order has been placed successfully. You can download your invoice <a href="../../orders/' . $pdf_file . '" target="_blank">here</a>.</p>
+            <p>Order ID: ' . $invoiceNumber . '</p>
+            <p>Order date: ' . $invoiceDate . '</p>
+            <p>Order address: ' . $address . '</p>
+        </div>
+        ';
+    }
 
     $pdf_data = file_get_contents('../../orders/' .$invoiceNumber . '.pdf');
     $pdf_data = mysqli_real_escape_string($connection, $pdf_data);

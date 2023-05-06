@@ -209,13 +209,14 @@ if (isset($_POST["remove-product"])) {
                     'total': <?php echo (getCartTotal($connection, $_SESSION["userid"]) + (getCartTotal($connection, $_SESSION["userid"]) * 0.21)) ?>
                 }
 
+
                 $.ajax({
                     method: "POST",
                     url: "./checkout.php",
                     data: data,
                     success: function (response) {
                         console.log("Request succeeded: " + response);
-                        window.location.href = "./checkout.php";
+                        window.location.href = './checkout.php?checkout=true&paypal=true';
                     },
                     error: function(xhr, status, error) {
                         console.log("An error occurred: " + error);
@@ -223,6 +224,7 @@ if (isset($_POST["remove-product"])) {
                         console.log("Response: " + xhr.responseText);
                     }
                 });
+                
             })
         }
     }).render("#paypal-button-container");
