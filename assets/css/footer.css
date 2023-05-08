@@ -63,7 +63,9 @@ footer .footer-top .footer-right {
 }
 
 footer .footer-top .footer-right .footer-column {
+    flex: 1;
     display: flex;
+    justify-content: flex-start;
     flex-direction: column;
     gap: 20px;
 }
@@ -86,6 +88,7 @@ footer .footer-top .footer-right .footer-column a {
     font-size: 24px;
     text-decoration: none;
     color: #ffffff;
+    transition: color .2s ease-in-out;
 }
 
 footer .footer-top .footer-right .footer-column a:hover {

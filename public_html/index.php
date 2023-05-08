@@ -2,7 +2,6 @@
 session_start();
 include '../includes/data.inc.php';
 
-
 if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
     addProductToCart($connection, $_SESSION["userid"], $_POST["id"]);
 }
@@ -98,15 +97,6 @@ if (isset($_SESSION["userid"]) && isset($_POST["add-item"])) {
                             <li><a href="#">About Store</a></li>
                             <li><a href="#">Jobs</a></li>
                             <li><a href="#">Support</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-column">
-                        <h3>Website</h3>
-                        <ul>
-                            <li><a href="#">Home</a></li>
-                            <li><a href="categories/games.php">Games</a></li>
-                            <li><a href="categories/components.php">Components</a></li>
-                            <li><a href="categories/peripherals.php">Peripherals</a></li>
                         </ul>
                     </div>
                     <div class="footer-column">

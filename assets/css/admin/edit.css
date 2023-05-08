@@ -33,8 +33,6 @@
 * {
     margin: 0;
     padding: 0;
-    transition: ease-in-out .2s;
-    transition: background-color none;
 }
 
 body {
@@ -134,11 +132,10 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 20px;
     color: #1B1B1D;
     background-color: #E38F25;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
 .left form input[type=submit]:hover {
-    border: none;
-    font-size: 20px;
     color: #E38F25;
     background-color: #ffffff;
 }

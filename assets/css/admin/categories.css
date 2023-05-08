@@ -33,8 +33,6 @@
 * {
     margin: 0;
     padding: 0;
-    transition: ease-in-out .2s;
-    transition: background-color none;
 }
 
 body {

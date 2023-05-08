@@ -33,8 +33,6 @@
 * {
     margin: 0;
     padding: 0;
-    transition: ease-in-out .2s;
-    transition: background-color none;
 }
 
 body {
@@ -119,15 +117,5 @@ h1, h2, h3, h4, h5, h6 {
     font-family: Linik-Medium;
     font-size: 24px;
     color: #E38F25;
-}
-
-.product .product-bottom button {
-    padding: 10px 70px;
-}
-
-.product .product-bottom button:hover {
-    background-color: #ffffff;
-    color: #E38F25;
-    cursor: pointer;
 }
 /* Copyright (c) 2023 Cédric Verlinden. All rights reserved. */

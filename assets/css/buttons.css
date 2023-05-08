@@ -36,6 +36,7 @@ button, .button {
     padding: 10px 50px;
     color: #1B1B1D;
     background-color: #E38F25;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
 }
 
 button:hover, .button:hover {
